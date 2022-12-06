@@ -1,0 +1,76 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+handler GridSorter type BasicHandler
+
+	sortByName String;
+	sortingUp boolean = true;
+	caseIgnore boolean = false;
+	
+	function columnSorter(grid Grid in, td Widget in, ignoreRow any in, ignoreRowNumber int in, column GridColumn in)
+		td.class = td.class + " EglRuiGridSorterTd";
+		td.onClick ::= sortColumn; 
+		span SPAN = td.children[1];
+		div Div { };
+		span.style = "float: left;";
+		td.children = [div as Widget];
+		image Span { width=0, height=0 };
+		image.style = "display: inline-block;";
+		if (column.name == sortByName)
+			if (sortingUp)
+				image.class = "EglRuiGridSorterArrayUp";
+			else
+				image.class = "EglRuiGridSorterArrayDown";
+			end
+			image.width = 7;
+			image.height = 8;
+			image.marginLeft = 4;
+			image.style = "float:left";
+		end
+		div.children = [ span, image ];
+		div.class = "EglRuiGridSorterDiv";
+	end
+	
+	function sortColumn(e Event in)
+		td Widget = e.widget;
+		grid Grid = td.logicalParent;
+		sortByName = grid.getColumn(td).name;
+		data any[] = grid.data;
+		sortingUp = !sortingUp;
+		RUILib.sort(data, sortFunction);
+		grid.data = data;
+	end
+	
+	function SortFunction(a any in, b any in) returns (int)
+		result int;
+	    aString String;
+	    bString String;
+	
+	    if (caseIgnore)
+	        aString = StrLib.lowerCase(a[sortByName] as String); 
+	        bString = StrLib.lowerCase(b[sortByName] as String); 
+	    else 
+	        aString = a[sortByName] as String; 
+	        bString = b[sortByName] as String;   
+	    end
+	
+	    if (aString < bString)
+	        result = 1;
+	    else
+	        result = -1;
+	    end
+		
+		if (sortingUp)
+			result = -result;
+		end
+		return (result);
+	end
+		
+end

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource name="com.ibm.egl.rui_4.3.7">
+	<storedValue key="DefaultBuildDescriptorNonJavaScriptDebugName" value=""/>
+	<storedValue key="EGLProjectFeatureMask" value="16"/>
+	<storedValue key="DefaultBuildDescriptorJavaTargetPath" value=""/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptTargetName" value="com_ibm_egl_ruiJavaScriptBuildOptions"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptDebugName" value="com_ibm_egl_ruiJavaScriptBuildOptions"/>
+	<storedValue key="EGLTargetRuntimeMask" value="3"/>
+	<storedValue key="EGLProjectMigrationVersion" value="8.0.0"/>
+	<storedValue key="EGLProjectSecondaryMigrationVersion" value="9.0"/>
+	<storedValue key="DefaultBuildDescriptorJavaTargetName" value=""/>
+	<storedValue key="DefaultBuildDescriptorNonJavaScriptDebugPath" value=""/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptTargetPath" value="com.ibm.egl.rui_4.3.7/EGLSource/com_ibm_egl_rui.eglbld"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptDebugPath" value="com.ibm.egl.rui_4.3.7/EGLSource/com_ibm_egl_rui.eglbld"/>
+	<resource name="EGLSource">
+		<resource name="com">
+			<resource name="ibm">
+				<resource name="egl">
+					<resource name="rui">
+						<resource name="loader">
+							<resource name="services">
+								<resource name="ModuleLoaderService.egl">
+									<storedValue key="DefaultBuildDescriptorNonJavaScriptDebugName" value="com_ibm_egl_ruiDebugBuildOptions"/>
+									<storedValue key="DefaultBuildDescriptorJavaTargetPath" value="com.ibm.egl.rui_4.3.7/EGLSource/com_ibm_egl_rui.eglbld"/>
+									<storedValue key="DefaultBuildDescriptorJavaScriptTargetName" value=""/>
+									<storedValue key="DefaultBuildDescriptorJavaTargetName" value="com_ibm_egl_ruiJavaBuildOptions"/>
+									<storedValue key="DefaultBuildDescriptorNonJavaScriptDebugPath" value="com.ibm.egl.rui_4.3.7/EGLSource/com_ibm_egl_rui.eglbld"/>
+									<storedValue key="DefaultBuildDescriptorJavaScriptTargetPath" value=""/>
+								</resource>
+							</resource>
+							<resource name="internal">
+								<resource name="XMLLib.egl">
+									<storedValue key="DefaultBuildDescriptorNonJavaScriptDebugName" value="com_ibm_egl_ruiDebugBuildOptions"/>
+									<storedValue key="DefaultBuildDescriptorJavaTargetPath" value="com.ibm.egl.rui_4.3.7/EGLSource/com_ibm_egl_rui.eglbld"/>
+									<storedValue key="DefaultBuildDescriptorNonJavaScriptDebugPath" value="com.ibm.egl.rui_4.3.7/EGLSource/com_ibm_egl_rui.eglbld"/>
+									<storedValue key="DefaultBuildDescriptorJavaTargetName" value="com_ibm_egl_ruiJavaBuildOptions"/>
+								</resource>
+								<resource name="ModuleTypeLib.egl">
+									<storedValue key="DefaultBuildDescriptorJavaTargetPath" value="com.ibm.egl.rui_4.3.7/EGLSource/com_ibm_egl_rui.eglbld"/>
+									<storedValue key="DefaultBuildDescriptorJavaScriptTargetName" value="com_ibm_egl_ruiJavaScriptBuildOptions"/>
+									<storedValue key="DefaultBuildDescriptorJavaTargetName" value="com_ibm_egl_ruiJavaBuildOptions"/>
+									<storedValue key="DefaultBuildDescriptorJavaScriptTargetPath" value="com.ibm.egl.rui_4.3.7/EGLSource/com_ibm_egl_rui.eglbld"/>
+								</resource>
+							</resource>
+						</resource>
+					</resource>
+				</resource>
+			</resource>
+		</resource>
+	</resource>
+</resource>

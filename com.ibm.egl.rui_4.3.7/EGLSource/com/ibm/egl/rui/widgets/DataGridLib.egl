@@ -1,0 +1,27 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+// basic library
+library DataGridLib type BasicLibrary {}
+	
+	const ALIGN_RIGHT int = 2;
+	const ALIGN_LEFT int = 0; 
+	const ALIGN_CENTER int = 1;
+	
+	const DISABLE_SELECTION int = 0;
+	const SINGLE_SELECTION int = 1;
+	const MULTIPLE_SELECTION int = 2;
+	
+	const SORT_NONE int = 0;
+    const SORT_DOWN int = 1;
+    const SORT_UP int = 2;
+	
+	util DataGridUtil {};
+end

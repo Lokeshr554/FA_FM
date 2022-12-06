@@ -1,0 +1,59 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.Widget;
+
+/*
+ * This type is used by all Dojo widgets, and simplifies the life cycle challenges 
+ * offered by loading both the EGL Rich UI framework and the Dojo framework.
+ * 
+ * This is an internal type. Do not instantiate directly.
+ * 
+ */
+ExternalType DojoBase extends Widget type JavaScriptObject {
+	relativePath = "dojo/widgets",
+	javaScriptName = "DojoBase",
+	
+	includeFile = "includeDojo.html"
+	
+}
+	
+	/*
+	 * Get the Dojo widget id
+	 */
+	function getID() returns(String);
+	
+	/*
+	 * Event handler to be notified when Dojo widget finished loading
+	 */
+	onWidgetLoad EventHandler[] {@JavaScriptProperty, @VEEvent };
+
+	/*
+	 * Destroy the widget
+	 */
+	function destroy();
+	
+	/*
+	 * The Dojo theme
+	 */
+	 theme String;
+	 
+	 /*
+	  * Dojo base class
+	  */
+	 baseClass String;
+	 
+	 /*
+	  * The following two are Bidi-specific properties
+	  */
+	 symmetricSwap String;
+	 numericSwap String;	 
+	 
+end

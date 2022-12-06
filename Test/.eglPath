@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eglpath>
+	<eglpathentry kind="src" path="EGLSource"/>
+	<eglpathentry kind="src" path="/com.ibm.egl.rui.dojo.runtime.local_1.10.4"/>
+	<eglpathentry kind="src" path="/com.ibm.egl.rui_4.3.7"/>
+	<eglpathentry path="EGLbin" kind="output"/>
+</eglpath>

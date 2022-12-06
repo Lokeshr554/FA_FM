@@ -1,0 +1,28 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.javascript.JavaScriptProperty;
+import egl.ui.rui.Event;
+import egl.ui.rui.Widget;
+
+/*
+ * A menu that can be attached to any widgets, and that is activated as a context menu (usually with the right mouse).
+ */
+ExternalType DojoContextMenu Extends DojoContainer type JavaScriptObject{
+		relativePath = "dojo/widgets",
+		javaScriptName = "DojoContextMenu" 
+	}
+		
+	/*
+	 * The widgets that this context menu should be attached to
+	 */
+	targets Widget[ ] { @JavaScriptProperty };
+		
+end

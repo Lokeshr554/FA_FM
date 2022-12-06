@@ -1,0 +1,51 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+Handler Grouping type RUIWidget{targetWidget = fieldset, cssFile = "css/com.ibm.egl.rui.css"}
+	
+	text String { @EGLProperty { getMethod=getText, setMethod=setText } };
+	legend Widget { tagName = "legend", @EGLProperty{getMethod = getLegend, setMethod = setLegend} };
+	contents Div { };
+	private fieldSet Widget { tagName = "fieldset", children=[legend, contents] };
+
+	function setText(text string in)
+		legend.innerHTML = text;
+	end
+	
+	function getText() returns (string)
+		return (legend.innerHTML);
+	end	
+	
+	function removeChildren()  {@Override}
+		contents.removeChildren();
+	end
+	
+	function setChildren(children Widget[] in)  {@Override}
+		contents.setChildren(children);
+	end
+	
+	function getChildren() returns(Widget[])  {@Override}
+		return (contents.getChildren());
+	end
+	
+	function appendChild(newChild Widget in)  {@Override}
+		contents.appendChild(newChild);
+	end
+	
+	function setLegend(widget Widget in)
+		legend = widget;
+		fieldSet.children = [legend,contents];
+	end
+	
+	function getLegend() returns (widget)
+		return (legend);
+	end
+	
+end

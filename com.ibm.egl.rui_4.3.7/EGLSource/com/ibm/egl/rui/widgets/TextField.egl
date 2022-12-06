@@ -1,0 +1,118 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+handler TextField type RUIWidget{tagName="input", onConstructionFunction = start, cssFile = "css/com.ibm.egl.rui.css", 
+	@VEWidget{ 
+		category = "Display and Input",
+		template = "${typeName}{}", 
+		smallIcon = "icons/ctool16/textfield.gif",
+		largeIcon = "icons/ctool24/textfield.gif"
+	},
+	@VEDataTemplate{
+		dataTemplates = [
+			@DataTemplate{
+				name = "TextField (read only)",
+				dataMapping = @DataMapping {
+					forArray = false,
+					mappings = [MappingKind.TYPE_PRIMITIVE_STRING,
+								MappingKind.TYPE_PRIMITIVE_DATE,
+								MappingKind.TYPE_PRIMITIVE_TIME,
+								MappingKind.TYPE_PRIMITIVE_TIMESTAMP,
+								MappingKind.TYPE_PRIMITIVE_BIGINT,
+								MappingKind.TYPE_PRIMITIVE_BIN,
+								MappingKind.TYPE_PRIMITIVE_DECIMAL,
+								MappingKind.TYPE_PRIMITIVE_FLOAT,
+								MappingKind.TYPE_PRIMITIVE_INT,
+								MappingKind.TYPE_PRIMITIVE_NUM,
+								MappingKind.TYPE_PRIMITIVE_MONEY,
+								MappingKind.TYPE_PRIMITIVE_SMALLFLOAT,
+								MappingKind.TYPE_PRIMITIVE_SMALLINT]
+				},
+				purposes = [PurposeKind.FOR_DISPLAY, PurposeKind.FOR_UPDATE],
+				template = "${widgetName} ${typeName:com.ibm.egl.rui.widgets.TextField} {readOnly = true};"
+			},
+			@DataTemplate{
+				name = "TextField",
+				dataMapping = @DataMapping {
+					forArray = false,
+					mappings = [MappingKind.TYPE_PRIMITIVE_STRING,
+								MappingKind.TYPE_PRIMITIVE_BIGINT,
+								MappingKind.TYPE_PRIMITIVE_BIN,
+								MappingKind.TYPE_PRIMITIVE_DECIMAL,
+								MappingKind.TYPE_PRIMITIVE_FLOAT,
+								MappingKind.TYPE_PRIMITIVE_INT,
+								MappingKind.TYPE_PRIMITIVE_NUM,
+								MappingKind.TYPE_PRIMITIVE_MONEY,
+								MappingKind.TYPE_PRIMITIVE_SMALLFLOAT,
+								MappingKind.TYPE_PRIMITIVE_SMALLINT]
+				},
+				purposes = [PurposeKind.FOR_CREATE, PurposeKind.FOR_UPDATE],
+				template = "${widgetName} ${typeName:com.ibm.egl.rui.widgets.TextField} {};"
+			}
+		]
+	}}
+
+	maxLength int { @EGLProperty {}, @VEProperty{}};
+	text String { @EGLProperty { getMethod=getText, setMethod=setText }, @VEProperty{} };
+	readOnly boolean {@EGLProperty {getMethod=getReadOnly, setMethod=setReadOnly}, @VEProperty{}};
+	error boolean = false;
+	
+	private savedEnableSelection boolean;
+	private savedBackgroundColor string;
+
+	function start()
+		onFocusGained ::= enableSelection;
+		onFocusLost ::= disableSelection;
+	end
+	
+	private function enableSelection(e Event in)
+		savedEnableSelection = RUILib.getTextSelectionEnabled();
+		RUILib.setTextSelectionEnabled(true);
+	end
+	
+	private function disableSelection(e Event in)
+		RUILib.setTextSelectionEnabled(savedEnableSelection);
+	end
+		
+	private function getReadOnly() returns(boolean)
+		return(readOnly);
+	end
+	
+	private function setReadOnly(ro boolean in)
+		readOnly = ro;
+		if(readOnly)
+			setAttribute("readOnly", "true");
+			savedBackgroundColor = backgroundColor;
+			backgroundColor = null;
+			class = "EglRuiTextFieldReadOnly";
+		else
+			removeAttribute("readOnly");
+			backgroundColor = savedBackgroundColor;
+			class = "EglRuiTextField";
+		end
+	end
+
+	private function setText(text string in)
+		setAttribute("value", text);
+	end
+	
+	private function getText() returns (string)
+		return ( getAttribute("value") as string );
+	end
+	
+	private function getMaxLength() returns (int)
+		return (getAttribute("maxLength") as int);
+	end
+	
+	private function setMaxLength(maxLength int in)
+		setAttribute("maxLength", maxLength as String);
+	end
+
+end

@@ -1,0 +1,155 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+library InternalCharFormatter
+	use InternalMessageLib;
+
+	util InternalFormattingUtil{};
+
+	function format(input string? in, dateFormat string in, timeFormat string in,
+			isUppercase boolean in, isLowercase boolean in, typeChkMsgKey string in) returns(string)
+		if (input == null)
+			return("");
+		end
+		
+		if (dateFormat != "")
+			return(asDate(input, dateFormat, typeChkMsgKey));
+		end
+		if (timeFormat != "")
+			return(asTime(input, timeFormat, typeChkMsgKey));
+		end
+		if (isUpperCase)
+			return(strlib.upperCase(input));
+		end
+		if (isLowercase)
+			return(strlib.lowerCase(input));
+		end
+		return(input);
+	end
+	
+	private function asDate(input string in, format string in, msg String in) returns(string?)
+		if (input == "")
+			return("");
+		end
+		
+		savedFormat string = strlib.defaultDateFormat;
+		try
+			strlib.defaultDateFormat = util.getLongGregorianDateMask();
+			
+			sizeDifference int = strlib.characterLen(strlib.defaultDateFormat) - strlib.characterLen(input);
+			if (sizeDifference < 0)
+				input = input[1:strlib.characterLen(strlib.defaultDateFormat)];
+			else
+				if (sizeDifference != 0)
+					for (i int from 1 to sizeDifference)
+						input += "0";
+					end
+				end
+			end
+			
+			d date = input;
+			result string? = strLib.formatDate(d, format);
+			strlib.defaultDateFormat = savedFormat;
+			return(result);
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultDateFormat;
+			strlib.defaultDateFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(msg, "CRRUI2708E", [errorFormat]), messageId = "CRRUI2708E"};
+		end
+	end
+	
+	private function asTime(input string in, format string in, msg string in) returns(string?)
+		if (input == "")
+			return("");
+		end
+		
+		savedFormat string = strlib.defaultTimeFormat;
+		try
+			strlib.defaultTimeFormat = "HH:mm:ss";
+			
+			sizeDifference int = strlib.characterLen(strlib.defaultTimeFormat) - strlib.characterLen(input);
+			if (sizeDifference < 0)
+				input = input[1:strlib.characterLen(strlib.defaultTimeFormat)];
+			else
+				if (sizeDifference != 0)
+					for (i int from 1 to sizeDifference)
+						input += "0";
+					end
+				end
+			end
+			
+			t time = input;
+			result string? = strLib.formatTime(t, format);
+			strlib.defaultTimeFormat = savedFormat;
+			return(result);
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultTimeFormat;
+			strlib.defaultTimeFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(msg, "CRRUI2708E", [errorFormat]), messageId = "CRRUI2708E"};
+		end
+	end
+	
+	function unformat(input string in, dateFormat string in, timeFormat string in,
+			isUppercase boolean in, isLowercase boolean in, typeChkMsgKey string in) returns(string)
+		input = strLib.clip(input, 0);
+		if (dateFormat != "")
+			return(fromDate(input, dateFormat, typeChkMsgKey));
+		end
+		if (timeFormat != "")
+			return(fromTime(input, timeFormat, typeChkMsgKey));
+		end
+		if ( isUppercase )
+			return(strlib.upperCase(input));
+		end
+		if ( isLowercase )
+			return(strlib.lowerCase(input));
+		end
+		return(input);
+	end
+	
+	private function fromDate(input string in, format string in, msg string in) returns(string?)
+		if (input == "")
+			return("");
+		end
+		
+		savedFormat string = strlib.defaultDateFormat;
+		try
+			strlib.defaultDateFormat = format;
+			//if the input wasn't a valid date, this will throw an exception
+			d date = input;
+			result string? = strLib.formatDate(d, util.getLongGregorianDateMask());
+			strlib.defaultDateFormat = savedFormat;
+			return(result);
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultDateFormat;
+			strlib.defaultDateFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(msg, "CRRUI2708E", [errorFormat]), messageId = "CRRUI2708E"};
+		end
+	end
+	
+	private function fromTime(input string in, format string in, msg string in) returns(string?)
+		if (input == "")
+			return("");
+		end
+		
+		savedFormat string = strlib.defaultTimeFormat;
+		try
+			strlib.defaultTimeFormat = format;
+			t time = input;
+			result string? = strLib.formatTime(t, "HH:mm:ss");
+			strlib.defaultTimeFormat = savedFormat;
+			return(result);
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultTimeFormat;
+			strlib.defaultTimeFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(msg, "CRRUI2708E", [errorFormat]), messageId = "CRRUI2708E"};
+		end
+	end
+end

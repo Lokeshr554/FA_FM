@@ -1,0 +1,18 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2013, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.loader.internal;
+
+// basic library
+library ModuleTypeLib type BasicLibrary {}
+	const css String = "cssFile";
+	const property String = "propertyFile";
+	const imports String = "importFile";
+	const runtimeProperty String = "runtimePropertyFile";
+	const include String = "includeFile";
+end

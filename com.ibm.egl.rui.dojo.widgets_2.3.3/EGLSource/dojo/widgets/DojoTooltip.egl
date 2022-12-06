@@ -1,0 +1,45 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.VEWidget;
+import egl.ui.rui.Widget;
+ 
+/**
+ * This is a widget to add tooltip for other widgets
+ *
+ * For more information on the Dojo widget itself, see http://docs.dojocampus.org/dijit/Tooltip
+ *
+ */
+ExternalType DojoTooltip extends DojoBase type JavaScriptObject {
+		relativePath = "dojo/widgets",
+		javaScriptName = "DojoTooltip"  
+	}
+			
+	/**
+	 * The IDs the tooltip should be attached to
+	 */
+	target string[] {@JavaScriptProperty};
+	
+	/**
+	 * Specify the label to use when drawing the button
+	 */
+	contents String {@JavaScriptProperty };
+	
+	/**
+	  * This specifies the prefered order, it's not guaranteed Dojo will position it this way
+	 */
+	defaultPosition string[] {@JavaScriptProperty };
+	
+	/**
+	  * The delay before the tooltip shows up
+	  */
+	delay int {@JavaScriptProperty };
+	
+end

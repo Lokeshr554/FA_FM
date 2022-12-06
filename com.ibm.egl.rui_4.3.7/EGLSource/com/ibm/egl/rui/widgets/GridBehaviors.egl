@@ -1,0 +1,51 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+library GridBehaviors
+
+	function whiteCells(grid Grid in, td Widget in, row any in, rowNumber int in, column GridColumn in) 
+		td.class = td.class + " EglRuiGridCellColor2";
+	end
+	
+	function grayCells(grid Grid in, td Widget in, row any in, rowNumber int in, column GridColumn in) 
+		td.class = td.class + " EglRuiGridCellColor1";
+	end
+	
+	function alternatingColor(grid Grid in, td Widget in, row any in, rowNumber int in, column GridColumn in) 
+		if (rowNumber % 2 == 1)
+			td.class = td.class + " EglRuiGridCellColor3";
+		end
+	end
+	
+	function tightCells(grid Grid in, td Widget in, row any in, rowNumber int in, column GridColumn in) 
+		td.class = td.class + " EglRuiGridCellTight";
+	end
+		
+	function getColumn(td Widget in) returns(GridColumn)
+		tr Widget = td.parent;
+		grid Grid = td.logicalParent;
+		cells Widget[] = tr.children;
+		for (n int from 1 to cells.getSize() by 1)
+			if (cells[n] == td)
+				return (grid.columns[n]);  
+			end
+		end
+		return (null);
+	end
+	
+	function hasParent(widget Widget in, target Widget in) returns(boolean)
+		while (widget != null && (widget != target))
+			widget = widget.parent;
+		end
+		return (widget == target);
+	end
+	
+end
+	

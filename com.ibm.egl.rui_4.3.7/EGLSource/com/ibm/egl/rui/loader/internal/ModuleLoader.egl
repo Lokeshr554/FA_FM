@@ -1,0 +1,262 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.loader.internal;
+
+import com.ibm.egl.rui.loader.DynamicLoader;
+import com.ibm.egl.rui.loader.HandlerLoadedEvent;
+import com.ibm.egl.rui.loader.services.ModuleLoaderService;
+import com.ibm.egl.rui.widgets.HTML;
+import egl.ui.rui.Widget;
+
+ExternalType Helper type JavaScriptObject{
+		relativePath = "com/ibm/egl/rui/loader",
+		javaScriptName = "Helper"
+	}
+	function createHandler(handlerName String in) returns(any);
+	function eval(script String in);
+	function getField(ruiHandler any in, fieldName String in) returns(any []);
+	function getContext() returns(String);
+	function getPortNumber() returns(int);
+	function getLocale() returns(String);
+	function getBrowserName() returns(String);
+	function alert(message String in) returns(String);
+	function notYetLoaded(name String in) returns(boolean);
+	function unload(name String in) returns(boolean);
+	function getBaseURL() returns(String);
+	function replaceAll(source String in, target String in, replacement String in) returns(string);
+	function loadFile(uri String in, fileLoaded FileLoaded in);	
+	function inDeploymentMode() returns(boolean);
+	function getStartMillis() returns(int);
+	function getCurrentMillis() returns(int);
+	function getDynamicLoadingList() returns(String);
+	function split(str String in, delimiters String in) returns(String []);
+	function deleteDefaultConstructor(handlerName String in);
+	function setDefaultConstructor(handlerName String in);
+	function handlerLoaded(fullHandlerName String in) returns(boolean);
+	function configureServiceWrapper(serviceWrapper any in);
+end
+
+Record Module 
+	name String;
+	javascript String;
+	moduleType String;
+end
+
+Delegate FileLoaded(contents string in) end
+
+handler ModuleLoader type BasicHandler {}
+	FAILLISTENER String = "FAILLISTENER";
+	INFORLISTENER String = "INFORLISTENER";
+	DONELISTENER String = "DONELISTENER";
+
+	use DynamicLoader;
+	context String = helper.getContext();
+	helper Helper{};
+	components String[];
+	handlerName String;
+	baseURL String = helper.getBaseURL();
+	
+	modules Module[];
+	currentModuleNum int;
+	allJavaScript String;
+	alreadyLoaded int;	
+	moduleNames String[];
+	instantiate boolean = true;
+	
+
+	function loadHandler(handlerName String in, aInstantiate boolean)
+		this.handlerName = resolvePackageName(handlerName);
+		this.instantiate = aInstantiate;
+
+		if(!helper.handlerLoaded(handlerName))
+			svc ModuleLoaderService { @DedicatedService {} };
+			helper.configureServiceWrapper(svc);
+			call svc.getModules(context, this.handlerName, helper.getPortNumber(), helper.getLocale(), helper.getDynamicLoadingList(), getLoadedJsModule()) returning to handleModules onException noHandlerFound;
+		else
+			createHandler();
+		end
+	end
+
+	function handleModules(modules Module[] in)
+		this.modules = modules;
+		allJavaScript = "";
+		alreadyLoaded = 0;
+		currentModuleNum = 0;
+		deployCache[handlerName] = [];
+		moduleNames = [];
+		this.invokeListeners(INFORLISTENER, null, "Received  "+modules.getSize()+" modules", INFO_DEBUG, null);
+		try			
+			doHandleModules();
+		onException( e AnyException)
+			this.invokeListeners(FAILLISTENER, null, "<font color=red><b>" + e.message+"</b></font>", null, null);
+		end
+	end
+	
+	private function getLoadedJsModule()returns(String)
+		jsNameArr String [] = loadedJsModuleCache.getKeys();
+		retStr String = "";
+		len int = jsNameArr.getSize();
+		for (counter int from 1 to len)
+			includeJs string = loadedJsModuleCache[jsNameArr[counter]];
+			lenJs int = strlib.characterLen(includeJs);
+			if( lenJs >3 && includeJs[lenJs - 2:lenJs] == ".js")
+				if(counter == 1)
+					retStr = jsNameArr[counter];
+				else
+					retStr += "," + jsNameArr[counter];
+				end
+			end
+		end
+		
+		return(retStr);
+	end
+	
+	private function resolvePackageName(fullname String) returns(String)
+		delimiters String = ".";
+		arrFullName String[] = helper.split(fullname, delimiters);
+		tokenCount Int = arrFullName.getSize();
+		if(tokenCount <2 )
+			return(fullname);
+		end
+		handlerName = arrFullName[tokenCount];
+		packageName String = fullName[1 : Strlib.characterLen(fullName) - Strlib.characterLen(handlerName) -1];
+		return( strlib.lowerCase(packageName) + "." + handlerName);
+	end
+	
+	function doHandleModules()
+		currentModuleNum += 1;
+		if(currentModuleNum <= this.modules.getSize())
+			this.invokeListeners(INFORLISTENER, null, "Processing module "+currentModuleNum, INFO_DEBUG, null);
+			module Module = modules[currentModuleNum];	
+			loadedJsModuleCache[module.name] = module.name;
+			if (helper.notYetLoaded(module.name))
+				this.invokeListeners(INFORLISTENER, null, "Module " + module.name + " is not yet loaded", INFO_DEBUG, null);
+				moduleNames ::= module.name; // Only record this module name if it is being loaded as part of 'handlerName'
+				helper.loadFile(baseURL + module.name, handleModuleContent);
+			else
+				this.invokeListeners(INFORLISTENER, null, "Module " + module.name + " is already loaded", INFO_DEBUG, null);
+				alreadyLoaded += 1;
+				doHandleModules();
+			end
+		else
+			deployCache[handlerName] = moduleNames;			
+            helper.deleteDefaultConstructor(handlerName);
+			helper.eval(allJavaScript);
+			this.invokeListeners(INFORLISTENER, null, "Processed " + (currentModuleNum - 1) + " modules (of which " + alreadyLoaded + " components were already loaded).", INFO_DEBUG, null);
+			try 
+				createHandler();
+			onException (e AnyException)
+				loadedJsModuleCache.removeAll();
+				this.invokeListeners(FAILLISTENER, null,  "<font color=red><b>" + e.message+"</b></font>", null, null);
+			end 
+		end
+	end
+	
+	function handleModuleContent(content String in)
+		currentModule Module = this.modules[currentModuleNum];
+		allJavaScript += "// component " + currentModule.name + "\r\n" + content + "\r\n\r\n";
+		this.invokeListeners(INFORLISTENER, currentModule.name, null, INFO_LOAD, null);
+		doHandleModules();
+	end
+		
+	function unloadHandler(handlerName String in)
+		if(deployCache.containsKey(handlerName))
+			try
+				components String[] = deployCache[handlerName];
+				if (components != null)
+					this.handlerName = handlerName;
+					for (n int from 1 to components.getSize())
+						if(!matchUnloadFilter(components[n]))
+							unloaded boolean = helper.unload(components[n]);	
+							if(unloaded)
+								loadedJsModuleCache[components[n]] = "";
+								this.invokeListeners(INFORLISTENER, components[n], null, INFO_UNLOAD, null);
+							else
+								this.invokeListeners(INFORLISTENER, components[n], null, INFO_UNLOAD_SKIP, null);
+							end
+						else
+							this.invokeListeners(INFORLISTENER, components[n], null, INFO_UNLOAD_SKIP, null);
+						end
+					end
+				end
+				deployCache[handlerName] = [];
+				helper.setDefaultConstructor(handlerName);
+			onException (e AnyException)
+				this.invokeListeners(FAILLISTENER, null, "UNLOAD " + handlerName + ": " + e.message, null, null);
+			end	
+		end
+	end
+	
+	function matchUnloadFilter(moduleName string in) returns (boolean)
+		filterCounts int = unloadFilter.getSize();
+		filterLen int;
+		filter string;
+		moduleNameLen int = StrLib.characterLen(moduleName);
+		for(i int from 1 to filterCounts)
+			filter = unloadFilter[i];
+			filterLen = StrLib.characterLen(filter);
+			if(moduleNameLen >= filterLen)
+				if (moduleName[1:filterLen] == filter)
+					return (true);
+				end
+			end 
+		end
+		return (false);
+	end
+
+	function noHandlerFound(e AnyException in)
+		details String = e.message + " " + 
+			(e as serviceInvocationException).detail1 + " " +
+			(e as serviceInvocationException).detail2 + " " +
+			(e as serviceInvocationException).detail3;		
+		this.invokeListeners(FAILLISTENER, null, "<font color=red><b>Cannot load " + handlerName +"</b></font>: " + details, null, null);
+	end
+		
+	function createHandler()
+		if(this.instantiate)
+			this.invokeListeners(INFORLISTENER, null, "Now creating an instance of "+handlerName, INFO_DEBUG, null);
+			page any = helper.createHandler(handlerName);
+			widgets Widget[0];
+			try
+				widgets.appendAll(helper.getField(page, "initialUI"));
+			onException (ignoreMissingInitialUIField AnyException)
+			end
+			handlerLoadedEvent HandlerLoadedEvent {
+				name = handlerName, 
+				initialUI = widgets,
+				theHandler = page
+			};
+			this.invokeListeners(DONELISTENER, null, null, null, handlerLoadedEvent);
+		else
+			handlerLoadedEvent HandlerLoadedEvent {
+				name = handlerName, 
+				initialUI = [],
+				theHandler = null
+			};
+			this.invokeListeners(DONELISTENER, null, null, null, handlerLoadedEvent);
+		end
+	end	
+	
+	private function invokeListeners(ListenerType String in, resourceName String in, message String in, code String in, loadedEvent HandlerLoadedEvent in)
+		case (ListenerType)
+			when(INFORLISTENER)
+				for(i int from 1 to loadInfoListeners.getSize())
+					loadInfoListeners[i](handlerName, resourceName, code, message);
+				end	
+			when(FAILLISTENER)
+				for(i int from 1 to loadFailListeners.getSize())
+					loadFailListeners[i](handlerName, message);
+				end
+			when(DONELISTENER)
+				for(i int from 1 to loadDoneListeners.getSize())
+					loadDoneListeners[i](loadedEvent);
+				end	
+		end
+	end
+end

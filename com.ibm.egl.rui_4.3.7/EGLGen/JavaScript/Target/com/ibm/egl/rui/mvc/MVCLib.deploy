@@ -1,0 +1,22 @@
+<deploy package="com.ibm.egl.rui.mvc" partName="MVCLib" partType="BasicLibrary" version="2">
+	<buildDescriptors>
+		<buildDescriptor name="com_ibm_egl_ruiJavaScriptBuildOptions" fileName="\com.ibm.egl.rui_4.3.7\EGLSource\com_ibm_egl_rui.eglbld" egldd="" genProject="com.ibm.egl.rui_4.3.7"/>
+	</buildDescriptors>
+	<includes>
+		<include>com/ibm/egl/rui/mvc/InternalFormattingUtil.js</include>
+		<include>com/ibm/egl/rui/mvc/InternalMessageLib.js</include>
+		<include>com/ibm/egl/rui/mvc/InternalCharFormatter.js</include>
+		<include>com/ibm/egl/rui/mvc/InternalDateFormatter.js</include>
+		<include>com/ibm/egl/rui/mvc/InternalFormatters.js</include>
+		<include>com/ibm/egl/rui/mvc/InternalNumericFormatter.js</include>
+		<include>com/ibm/egl/rui/mvc/InternalTimeFormatter.js</include>
+		<include>com/ibm/egl/rui/mvc/InternalTimestampFormatter.js</include>
+		<include>com/ibm/egl/rui/mvc/InternalValidators.js</include>
+		<include>com/ibm/egl/rui/mvc/Controller.js</include>
+		<include>com/ibm/egl/rui/mvc/MVCLib.js</include>
+	</includes>
+	<runtimePropertyFiles>
+		<runtimePropertyFile>rununit</runtimePropertyFile>
+	</runtimePropertyFiles>
+	<ruiHandler/>
+</deploy>

@@ -1,0 +1,36 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+Delegate
+	GridTooltipTextProvider(row any in, fieldName String in, td Widget in) returns(Box)
+end
+
+handler GridTooltip type BasicHandler { }
+
+	provider GridTooltipTextProvider;
+	grid Grid;
+	
+	private tooltip ToolTip { provider = getTooltipContents };
+	
+	function setTooltips(grid Grid in, td Widget in, row any in, rowNumber int in, column GridColumn in)
+		tooltip.enable(td);
+		td.setAttribute("rowNumber", rowNumber); 
+		this.grid = grid;
+	end
+	
+	function getTooltipContents(widget any in) returns(Box)
+		td Widget = widget;
+		row any = grid.data[td.getAttribute("rowNumber")];
+		column GridColumn = GridBehaviors.getColumn(td);
+		tip Box = provider(row, column.name, td);
+		return(tip);
+	end
+	
+end

@@ -1,0 +1,98 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+import com.ibm.egl.rui.widgets.TextLabel;
+import egl.ui.rui.Widget;
+
+handler FormManager type RUIWidget
+
+	entries FormField[] { @EGLProperty { setMethod=setEntries, getMethod=getEntries } };
+	
+	function setEntries(entries FormField[] in)
+		this.entries = entries;
+		for (n int from 1 to entries.getSize() by 1)
+			this.entries[n].labelClass = entries[n].nameLabel.class;
+			if (this.entries[n].controller.validStateSetter == null)
+				this.entries[n].controller.validStateSetter = validStateSetter;
+			end
+		end
+	end
+	
+	function getEntries() returns(FormField[])
+		return (entries);
+	end		
+	
+	
+	function commit()
+		for (n int from entries.getSize() to 1 decrement by 1)
+			entries[n].controller.commit();
+			msg String = entries[n].controller.getErrorMessage();
+			if (!(msg == null || msg == "") && entries[n].errorLabel != null) 
+				entries[n].errorLabel.text = msg;
+			end
+		end
+	end
+	
+	function publish()
+		for (n int from entries.getSize() to 1 decrement by 1)
+			entries[n].controller.publish();
+		end		 
+	end
+	
+	function isValid() returns(boolean)
+		result boolean = true;
+		for (n int from entries.getSize() to 1 decrement by 1)
+			if (!entries[n].controller.isValid())
+				result = false;
+			end
+		end
+		return(result);
+	end
+	
+	function isFormValid() returns(boolean)
+		result boolean = true;
+		for (n int from entries.getSize() to 1 decrement by 1)
+			if (!entries[n].controller.isControllerValid())
+				result = false;
+			end
+		end
+		return(result);
+	end
+
+    function validStateSetter(view Widget in, valid boolean in)
+        for(n int from entries.getSize() to 1 decrement by 1)
+            entry FormField = entries[n];
+            if(entry.controller.view == view)
+                msg string? = entry.controller.getErrorMessage();
+                if(entry.errorLabel != null)
+                    entry.errorLabel.text = msg;
+                end
+                if(entry.nameLabel != null)
+                    if(valid)
+                        entry.nameLabel.class = entry.labelClass;
+                    else
+                        entry.nameLabel.class = entry.labelClass + " FormErrorLabel";
+                    end
+                end
+                exit for;
+            end
+        end
+    end
+
+    function validate() returns(boolean)
+        for(n int from entries.getSize() to 1 decrement by 1)
+            if(!entries[n].controller.validate())
+                return(false);
+            end
+        end
+        return(true);
+	end
+	
+end

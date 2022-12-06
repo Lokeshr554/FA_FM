@@ -1,0 +1,38 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.Widget;
+
+/*
+ * This widget serves as an abstraction for a Dojo widget that shares the same text related properties.
+ * Subclasses are DojoValidationBase, DojoTextArea, etc
+ * 
+ * This is an internal type. Do not instantiate directly.
+ */ 
+ExternalType DojoTextBase extends DojoBase type JavaScriptObject {
+	relativePath = "dojo/widgets",
+	javaScriptName = "DojoTextBase"
+}
+	text string { @JavaScriptProperty, @VEProperty };
+	maxLength int { @JavaScriptProperty, @VEProperty };
+	selectOnClick boolean { @JavaScriptProperty, @VEProperty };
+	readOnly boolean { @JavaScriptProperty, @VEProperty };	
+	
+	textCase string { @JavaScriptProperty, @VEProperty{
+		propertyType = "choice",
+		choices = [
+			@VEPropertyChoice {displayName = "upper case", id = "${typeName:dojo.widgets.DojoLib}.UPPER_CASE"},
+			@VEPropertyChoice {displayName = "lower case", id = "${typeName:dojo.widgets.DojoLib}.LOWER_CASE"},
+			@VEPropertyChoice {displayName = "proper case", id = "${typeName:dojo.widgets.DojoLib}.PROPER_CASE"}
+		]
+	} };
+	trim boolean { @JavaScriptProperty, @VEProperty };
+	suppressChangeEvent boolean { @JavaScriptProperty, @VEProperty };
+end

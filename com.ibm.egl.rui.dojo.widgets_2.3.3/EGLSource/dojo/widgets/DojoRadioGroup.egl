@@ -1,0 +1,66 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.VEWidget;
+import egl.ui.rui.Widget;
+/**
+ * This is a radio button group widget. 
+ *
+ * For more information on the Dojo widget itself, see http://docs.dojocampus.org/dojox/layout/RadioGroup
+ *
+ */  
+ExternalType DojoRadioGroup Extends DojoBase type JavaScriptObject{
+		relativePath = "dojo/widgets",
+		javaScriptName = "DojoRadioGroup",
+	@VEWidget{
+		displayName = "RadioGroup",
+		category = "Display and Input",
+		template = 
+			"${typeName}{ \n\t\t" +
+				"vertical = true, //onChange ::= chooseDrink\n\t\t" +
+				"options = [ \"soda\", \"coffee\", \"tea\" ],\n\t\t" +
+				"selected = \"coffee\"\n\t" +
+			"}",
+		smallIcon = "icons/ctool16/dijit_radiobutt_pal16.gif",
+		largeIcon = "icons/ctool24/dijit_radiobutt_pal24.gif",
+		propertyFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+		propertyFilter = [ "class", "color", "font", "fontSize", "x", "y", "cursor", "ariaLive", "ariaRole", "tabIndex" ],
+		eventFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+       	eventFilter  = ["onFocusGained", "onFocusLost", "onSelect", "onScroll"],
+		provider = "Dojo"
+	},
+	@MVCView{
+			retrieveViewHelper = getValueAsText,
+			publishHelper = setValueAsText
+	}}
+
+	/*
+	 * Make this a vertical radio group (the radiobuttons will be stacked on top of each other)
+	 */
+	vertical boolean {@VEProperty};
+
+	/*
+	 * The options to show as radio buttons
+	 */
+	options string[]{ @JavaScriptProperty { setMethod="setOptions" , getMethod="getOptions" }, @VEProperty{}};
+	
+	/*
+	 * The currently selected option (has to be one of the values in the options array
+	 */
+	selected string{ @JavaScriptProperty { setMethod="setSelected" , getMethod="getSelected" }, @VEProperty{}};
+	
+	/*
+	 * Function for Bidi operation
+	 */
+	function setBiDiMarkers(); 	
+	private function getValueAsText() returns(String);
+	private function setValueAsText(str String in);
+
+end

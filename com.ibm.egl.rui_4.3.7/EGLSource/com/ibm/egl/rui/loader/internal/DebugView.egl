@@ -1,0 +1,136 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+
+package com.ibm.egl.rui.loader.internal;
+
+import com.ibm.egl.rui.loader.DynamicLoader;
+import com.ibm.egl.rui.loader.HandlerLoadedEvent;
+import com.ibm.egl.rui.widgets.Button;
+import com.ibm.egl.rui.widgets.Div;
+import com.ibm.egl.rui.widgets.GridLayout;
+import com.ibm.egl.rui.widgets.GridLayoutData;
+import com.ibm.egl.rui.widgets.HTML;
+import egl.javascript.Job;
+import egl.ui.rui.Event;
+
+handler DebugView type RUIWidget {targetWidget = monitor, onConstructionFunction = start }
+	monitor Div{children = [HTML, showDebugViewButton, amonitor]}; 
+	amonitor HTML {
+		backgroundColor = "RGB(217,234,233)",  height= 400, padding = 5,
+		borderWidth = 2, borderColor = "LightBlue", 
+		text = "", style="overflow-y:scroll",
+		onMouseOver ::= enableSelection,
+		layoutData = new GridLayoutData{ row = 1, column = 1 },
+		borderStyle = "solid"
+	};
+	helper Helper{};
+	dojoUsed boolean;
+	showDebugViewButton Button{ text = "<<Hide", onClick ::= showDebugViewButton_onClick };
+	HTML HTML{ text = "<hr style = 'border:1px solid RGB(217,234,233);'>Dynamic Loader Debug View",
+		color = "DarkSeaGreen",
+		fontWeight = "bold",
+		fontSize = "25" };
+		
+	function start()
+		DynamicLoader.loadDoneListeners ::= traceDone;
+		DynamicLoader.loadFailListeners ::= traceFailed;
+		DynamicLoader.loadInfoListeners ::= traceInfo;
+		new Job { runFunction = addToBody }.schedule();
+	end
+	
+	function enableSelection(e Event in)
+		if(!RUILib.getTextSelectionEnabled())
+			RUILib.setTextSelectionEnabled(true);
+		end
+	end
+	
+	function traceDone(e HandlerLoadedEvent in)
+		msg string;
+		if(e.theHandler!=null)
+			msg = "<font color=blue>["+datetimelib.currentTimeStamp()+"]</font> <font color=orange><b>"
+						+e.name+"&nbsp;</b><b>LOAD DONE. &nbsp;" + e.initialUI.getSize() 
+						+ " ui widget(s) initilized.</b> </font><br>";
+		else
+			msg = "<font color=blue>["+datetimelib.currentTimeStamp()+"]</font> <font color=orange><b>"
+						+e.name+"&nbsp;</b><b>LOAD DONE. no instance is created.</b> </font><br>";
+		end
+			debug(msg);
+	end	
+
+	function traceFailed(handlerName string in, message string in)
+		details String = message;
+		if (strlib.indexOf(message, "Connection refused: connect") > 0)
+			try
+				details = details[strlib.indexOf(details, "URL")+4 : strlib.characterLen(details)];
+				details = details[1 : strlib.indexOf(details, "EGL000")-1];
+				details = "Bound service for IModuleLoader is not running. Please check deployment descriptor and start server. URL: " + details;
+			onException (e AnyException)
+				details = message;
+			end
+		end
+		if (strlib.indexOf(message, "404 ") > 0)
+			try
+				details = details[strlib.indexOf(details, "URL")+4 : strlib.characterLen(details)];
+				details = details[1 : strlib.indexOf(details, "EGL000")-1];
+				details = "Server is running, but it reports a 404 on the service. " + details;
+			onException (e AnyException)
+				details = message;
+			end
+		end
+		debug(handlerName + " load fail: <font color=red><b>" + details + "</b></font><br>");
+		if (dojoUsed || strlib.indexOf(details, "'dojo'") != 0)
+			debug("<font color=blue><b>Tip: Declare a Dojo widget field to your main handler</b></font><br>");
+		end
+	end
+	
+	function traceInfo(handlerName string in, resourceName string in, code string in, msg String in)
+		prefix String = "<font color=blue>["+datetimelib.currentTimeStamp()+"] <b>"+handlerName+"&nbsp;</b> <b>"+code+"&nbsp;</b>";
+		case(code)
+			when(DynamicLoader.INFO_DEBUG) traceDebug(msg, prefix);
+			when(DynamicLoader.INFO_LOAD) traceLoad(resourceName, prefix);
+			when(DynamicLoader.INFO_UNLOAD) traceUnload(resourceName, prefix);
+			when(DynamicLoader.INFO_UNLOAD_SKIP) traceUnloadSkip(resourceName, prefix);
+		end
+	end
+	
+	function traceLoad(resourceName String in, prefix String in)
+		debug(prefix + " <font color=orange><b>" + resourceName + "</b></font></font><br>");
+	end
+
+	function traceUnload(resourceName String in, prefix String in)
+		debug(prefix + " <font color=orange><b>" + resourceName + "</b></font></font><br>");
+	end
+
+	function traceUnloadSkip(resourceName String in, prefix String in)
+		debug(prefix + " <font color=blue>" + resourceName + "</font></font><br>");
+	end
+
+	function traceDebug(msg String in, prefix String in)
+		debug(prefix + msg + "</font><br>");
+	end
+
+	function debug(s String in) 
+		amonitor.text = s + amonitor.text;
+	end
+
+	function addToBody()
+		document.body.appendChild(monitor);
+	end
+	
+	function showDebugViewButton_onClick(event Event in)
+		if(amonitor.visible)
+			amonitor.visible = false;
+			showDebugViewButton.text = "Show>>";
+		else
+			showDebugViewButton.text = "<<Hide";
+			amonitor.visible = true;
+		end
+	end
+end
+

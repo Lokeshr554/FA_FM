@@ -1,0 +1,29 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+/**
+ * This is a Tree Node widget. It is the child of Tree widget.
+ *
+ * For more information on the dojo widget itself, see http://docs.dojocampus.org/dijit/Tree
+ *
+ */
+ExternalType DojoTreeNode Extends DojoContainer type JavaScriptObject{
+		relativePath = "dojo/widgets",
+		javaScriptName = "DojoTreeNode"
+	}
+	 
+	text String {@JavaScriptProperty{setMethod="setText", getMethod="getText"} };
+	
+	/*
+	 * Function for Bidi operation
+	 */
+	function setBiDiMarkers  (textLayout String in, reverseTextDirection String in);
+			
+end

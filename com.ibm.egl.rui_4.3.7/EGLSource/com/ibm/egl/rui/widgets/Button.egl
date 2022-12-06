@@ -1,0 +1,40 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+Handler Button type RUIWidget{
+			tagName = "input type=button",
+			cssFile = "css/com.ibm.egl.rui.css", 
+			@VEWidget{
+				category = "Display and Input",
+				template = "${typeName}{ text=\"Button\" }",
+				smallIcon = "icons/ctool16/button.gif",
+				largeIcon = "icons/ctool24/button.gif"
+			} }
+
+	text String{@EGLProperty{setMethod = setText, getMethod = getText}, @VEProperty{}};
+
+	private function setText(textIn String in)
+		text = textIn;
+		setAttribute("value", textIn);
+		isVisual boolean = this.textLayout == "Visual";
+		isReverseDirection boolean = this.reverseTextDirection == "Yes";		
+		if(isVisual || isReverseDirection)
+			this.setBiDiMarkers(isVisual, isReverseDirection);
+		end		
+	end
+	
+	private function getText() returns (String)
+		if(this.textLayout == "Visual" || this.reverseTextDirection == "Yes")
+			this.cleanBiDiMarkers();
+		end			
+		return ( getAttribute("value") as string);
+	end  
+
+end

@@ -1,0 +1,6 @@
+<deploy package="com.ibm.egl.rui.mvc" partName="InternalFormatters" partType="BasicLibrary" version="2">
+	<buildDescriptors>
+		<buildDescriptor name="com_ibm_egl_ruiJavaScriptBuildOptions" fileName="\com.ibm.egl.rui_4.3.7\EGLSource\com_ibm_egl_rui.eglbld" egldd="" genProject="com.ibm.egl.rui_4.3.7"/>
+	</buildDescriptors>
+	<ruiHandler/>
+</deploy>

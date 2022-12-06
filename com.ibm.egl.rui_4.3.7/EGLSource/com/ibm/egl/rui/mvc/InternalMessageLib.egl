@@ -1,0 +1,24 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+// basic library
+library InternalMessageLib type BasicLibrary {}
+	
+    function getRuntimeErrorMessage(msgKey string in, defaultMsgId string in, inserts string[] in) returns(string)
+        messageValue string;
+        if(msgKey == "")
+            messageValue = Syslib.getMessage(defaultMsgId, inserts);
+        else
+            messageValue = msgKey;
+        end
+        return(messageValue);
+    end
+	
+end

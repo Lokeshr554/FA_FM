@@ -1,0 +1,22 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+// basic library
+library GridLayoutLib type BasicLibrary {}
+
+	const ALIGN_LEFT int = 0; 
+	const ALIGN_CENTER int = 1;
+	const ALIGN_RIGHT int = 2;
+
+	const VALIGN_TOP int = 3; 
+	const VALIGN_MIDDLE int = 4;
+	const VALIGN_BOTTOM int = 5;
+	
+end

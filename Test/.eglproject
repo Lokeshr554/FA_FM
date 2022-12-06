@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource name="Test">
+	<storedValue key="EGLProjectMigrationVersion" value="8.0.0"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptTargetPath" value="Test/EGLSource/Test.eglbld"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptDebugName" value="TestJavaScriptBuildOptions"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptDebugPath" value="Test/EGLSource/Test.eglbld"/>
+	<storedValue key="EGLProjectFeatureMask" value="16"/>
+	<storedValue key="EGLProjectSecondaryMigrationVersion" value="9.0"/>
+	<storedValue key="EGLTargetRuntimeMask" value="3"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptTargetName" value="TestJavaScriptBuildOptions"/>
+</resource>

@@ -1,0 +1,32 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.Widget;
+
+/*
+ * This type is used by all Dojo chart widget, and abstracts out all the common
+ * functionality found in charts. 
+ * 
+ * This is an internal type. Do not instantiate directly.
+ * 
+ * For more information on Dojo charts, see http://docs.dojocampus.org/dojox/charting
+ *
+ */
+ExternalType DojoChartBase extends DojoBase type JavaScriptObject {
+	relativePath = "dojo/widgets",
+	javaScriptName = "DojoChartBase"
+}
+
+	/*
+	 * redraw the chart to fix rendering issues that may appear on IE
+	 */
+	function redraw();
+	
+end

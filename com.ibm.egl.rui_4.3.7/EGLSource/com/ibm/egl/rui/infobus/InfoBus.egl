@@ -1,0 +1,46 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.infobus;
+ 
+Delegate 
+	InfoBusCallback(eventName String in, dataObject any in)
+end
+
+//
+// A publish/subscribe architecture 
+//
+
+library InfoBus type BasicLibrary { }
+   
+   	bridge OpenAjaxHubBridge {};
+   	
+	//
+	// name			the name of the event to listen for. You can use dots and wildcards "*". 
+	// callback		the function to call when the event is published by anyone 
+	//   
+    function subscribe(name String in, callback InfoBusCallback) returns(any)
+    	return (bridge.subscribe(name, callback));
+    end
+    
+	//
+	// subscription	the subscription to cancel
+	//   
+    function unsubscribe(subscription any in)
+    	bridge.unsubscribe(subscription);
+    end
+
+	//
+	// name			the name of the event to publish. You can use dots.
+	// data			the data that should be passed to all subscribers
+	//   	
+    function publish(name String in, data any in)
+    	bridge.publish(name, data);
+    end
+
+end

@@ -1,0 +1,73 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.Widget;
+
+/*
+ * A Dojo container that has children and a title
+ * 
+ * For more detail, see http://docs.dojocampus.org/dijit/layout/ContentPane
+ */
+ExternalType DojoContentPane Extends DojoContainer type JavaScriptObject{
+		relativePath = "dojo/widgets",
+		javaScriptName = "DojoContentPane",
+		@VEWidget{ 
+			container = @VEContainer{},
+			propertyFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+			propertyFilter = [ "padding", "paddingLeft", "paddingRight", "paddingTop", "paddingBottom", "position", "x", "y", "opacity", "disabled", "ariaLive", "ariaRole", "tabIndex" ],
+			eventFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+       		eventFilter  = ["onChange", "onSelect","onScroll","onFocusGained", "onFocusLost", "onKeyDown", "onKeyPress", "onKeyUp"]
+		}
+	}
+	
+	/*
+	 * Set the region, applies only to bordercontainer
+	 */
+	
+	region String? { @VEProperty{
+		propertyType = "choice",
+		choices = [
+			@VEPropertyChoice {displayName = "center", id = "${typeName:dojo.widgets.DojoLib}.REGION_CENTER"},
+			@VEPropertyChoice {displayName = "top", id = "${typeName:dojo.widgets.DojoLib}.REGION_TOP"},
+			@VEPropertyChoice {displayName = "bottom", id = "${typeName:dojo.widgets.DojoLib}.REGION_BOTTOM"},
+			@VEPropertyChoice {displayName = "leading", id = "${typeName:dojo.widgets.DojoLib}.REGION_LEADING"},
+			@VEPropertyChoice {displayName = "left", id = "${typeName:dojo.widgets.DojoLib}.REGION_LEFT"},
+			@VEPropertyChoice {displayName = "right", id = "${typeName:dojo.widgets.DojoLib}.REGION_RIGHT"}		],
+		default = "${typeName:dojo.widgets.DojoLib}.REGION_CENTER"
+	}};
+
+	/*
+	 * The title for this pane. Used by parents, like DojoTabContainer and DojoAccordionContainer in the way they like
+	 */
+	title String{ @JavaScriptProperty{}, @VEProperty{} };
+	
+	/*
+	 * Indicates if this pane can be closed. Used by DojoTabContainer. Ignored by DojoAccordionContainer
+	 */
+	closable boolean{ @VEProperty{} };	
+	
+	/*
+	 *
+	 */
+	 
+	 splitter boolean{ @JavaScriptProperty{}, @VEProperty{} };
+	
+	/*
+	 *
+	 */
+	 
+	 function setTitle(val String in);
+	 
+	/*
+	 * Function for Bidi operation
+	 */
+	 function setBiDiMarkers  (textLayout String in, reverseTextDirection String in);
+	
+end

@@ -1,0 +1,349 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.loader.services;
+
+import com.ibm.egl.rui.loader.internal.Module;
+import com.ibm.egl.rui.loader.internal.ModuleTypeLib;
+import com.ibm.egl.rui.loader.internal.XMLLib;
+
+ExternalType File type JavaObject
+    {packageName = "com.ibm.egl.rui.loader", 
+    javaName = "File"}
+	function getURL(project String in, name String in, port int in) returns(String);
+	function getContents(project String in, name String in, port int in, context ServletContext in) returns(String);
+	function getContentsForImport(project String in, name String in, port int in, context ServletContext in) returns(String);
+end
+
+/* Servlet Feature */
+ExternalType StringBuffer extends Object type JavaObject {packageName = "java.lang"}
+	function append(ch unicode(1) in);
+end
+
+ExternalType InputStream extends Object type JavaObject {packageName = "java.io"}
+	function read()returns(int);
+	function closeStream() {JavaName="close"};
+end
+
+ExternalType ServletContext extends Object type JavaObject {packageName = "javax.servlet"}
+	function getResourceAsStream(path String in)returns(InputStream); 
+end
+
+ExternalType HttpSession extends Object type JavaObject {packageName = "javax.servlet.http"}
+	function invalidate();
+	function isNew() returns(boolean);
+	function getId() returns(string);
+	function getMaxInactiveInterval() returns(int);
+	function setMaxInactiveInterval(intervalVal int in); 
+	function getServletContext()returns(ServletContext);
+end
+
+ExternalType HttpServletRequest extends Object type JavaObject {packageName = "javax.servlet.http"}
+	function getSession() returns(HttpSession);
+end
+/* End of Servlet Feature */
+
+service ModuleLoaderService
+	
+	use XMLLib;
+	filehandler File{};
+	referencedDeployFiles Dictionary{};
+	filterDynamicLoadingHandlers Dictionary{};
+	filterDynamicLoadingIncludeFiles Dictionary{};
+	isServletFeatureSupported boolean = false;
+	hasDetectedServletFeature boolean = false;
+	
+	function getModules(project String in, name String in, port int in, alocale String in, dynamicLoadingList String in, loadedJsList String in) returns(Module[])
+		referencedDeployFiles.removeAll();
+		filterDynamicLoadingHandlers.removeAll();
+		filterDynamicLoadingIncludeFiles.removeAll();
+		modules Module[0];
+		strLen int = StrLib.byteLen(dynamicLoadingList);
+		i int = 1;
+		
+		while(i <= strLen)
+			dynamicHandler String = StrLib.getNextToken(dynamicLoadingList, i, ",");
+			dynamicHandler = resolvePackageName(dynamicHandler);
+			if(name != dynamicHandler)
+				filterDynamicLoadingHandlers[dynamicHandler] = dynamicHandler;
+			end
+		end
+		
+		loadedJsStrLen int = StrLib.byteLen(loadedJsList);
+		counter int = 1;
+		while(counter <= loadedJsStrLen)
+			loadJs String = StrLib.getNextToken(loadedJsList, counter, ",");
+			if(name != loadJs && strlib.characterLen(loadJs) > 3)//must end up with .js
+				filterDynamicLoadingIncludeFiles[loadJs] = loadJs;
+			end
+		end
+		
+		resolveDeploy(project, name, port, modules, alocale);
+		debug("return "+modules.getSize()+" modules");	
+
+		return (modules);		
+	end
+	
+	private function resolvePackageName(fullname String) returns(String)
+		delimiters String = ".";
+		tokenCount Int = strlib.getTokenCount(fullname, delimiters);
+		if(tokenCount <2 )
+			return(fullname);
+		end
+		tokens String[0];
+		i Int = 1;
+		strLenth Int = strlib.byteLen(fullname);
+		token String = "";
+		while(i <= strLenth)
+			token = strlib.getNextToken(fullname, i, delimiters);
+			if(null != token)
+				tokens.appendElement(token);
+			end
+		end
+		
+		handlerName String = tokens[tokenCount];
+		packageName String = fullName[1 : Strlib.characterLen(fullName) - Strlib.characterLen(handlerName) -1];
+		return( strlib.lowerCase(packageName) + "." + handlerName);
+	end
+	
+	private function resolveDeploy(project String in, name String, port int in, modules Module[] inout, alocale String in)
+		if(referencedDeployFiles.containsKey(name) || filterDynamicLoadingHandlers.containsKey(name))
+			return;
+		end
+		referencedDeployFiles[name] = name;
+		deploy RUIDeploy{};
+		name = replaceAll(name, ".", "/");
+		xml String = getContents(project, name + ".deploy", port, getServletContext() );
+		if (xml != "")
+			convertFromXML(xml, deploy);
+			debug("add referenced");
+			if (deploy.referencedHandlers.referencedHandler != null)
+				j int = 0;
+				for(j from 1 to deploy.referencedHandlers.referencedHandler.getSize())
+					if("" != deploy.referencedHandlers.referencedHandler[j])
+						dynamicHandlerJs string  = deploy.referencedHandlers.referencedHandler[j];
+						referencedHandler String = replaceAll(dynamicHandlerJs, "/", ".");
+						len int = strlib.characterLen(referencedHandler);
+						referencedHandler = referencedHandler[1 : len - 3];
+						resolveDeploy(project, referencedHandler, port, modules, alocale);
+					end
+				end
+			end	
+			debug("Loaded XML");
+			if (deploy.includes.include != null)
+				for (n int from 1 to deploy.includes.include.getSize())
+					include String = deploy.includes.include[n];
+					len int = strlib.characterLen(include);
+					if(!filterDynamicLoadingIncludeFiles.containsKey(include) && len > 3 && include[len - 2 : len] == ".js")
+						modules ::=  new Module {
+								name = include,
+								javascript = "",
+								moduleType = ModuleTypeLib.include
+						};		
+						includeJsFile String = replaceAll(include, "/", ".");
+						includeFieLen int = strlib.characterLen(include);
+						includeJsFile = include[1 : includeFieLen - 3];
+						filterDynamicLoadingIncludeFiles[include] = 1;
+						resolveImportDeploy(project, includeJsFile, port, modules, alocale);		
+					end
+				end
+			end
+			if (deploy.propertyFiles.propertyFile != null)
+				debug("add propertyfiles");
+				for (n int from 1 to deploy.propertyFiles.propertyFile.getSize())
+					if("" != deploy.propertyFiles.propertyFile[n])
+						propertiesFileExists boolean = false;
+						propertyFileName String;
+						if(null != alocale && "" != alocale)
+							propertyFileName = "properties/" + deploy.propertyFiles.propertyFile[n] + "-"+ alocale +".js";
+							propertiesFileExists  = checkPropertiesFileExists(project, propertyFileName, port);
+						end
+						if(!propertiesFileExists)
+							propertyFileName = "properties/" + deploy.propertyFiles.propertyFile[n]+".js";
+						end
+						
+						if(!filterDynamicLoadingIncludeFiles.containsKey(propertyFileName))
+							modules ::= new Module {
+								name = propertyFileName,
+								javascript = "",
+								moduleType = ModuleTypeLib.property
+							};
+							filterDynamicLoadingIncludeFiles[propertyFileName] = 1;
+						end
+					end
+				end
+			end
+			debug("add imports");
+			if (deploy.imports._import != null)
+				for (n int from 1 to deploy.imports._import.getSize())
+					_import String = deploy.imports._import[n];
+					if(!filterDynamicLoadingIncludeFiles.containsKey(_import))
+						modules ::= new Module {
+							name = _import,
+							javascript = "",
+							moduleType = ModuleTypeLib.imports
+						};
+						filterDynamicLoadingIncludeFiles[_import] = 1;
+					end
+				end
+			end	
+		end
+	end
+	
+	private function resolveImportDeploy(project String in, name String, port int in, modules Module[] inout, alocale String in)
+		if(referencedDeployFiles.containsKey(name) || filterDynamicLoadingHandlers.containsKey(name))
+			return;
+		end
+		referencedDeployFiles[name] = name;
+		deploy RUIDeploy{};
+		name = replaceAll(name, ".", "/");
+		xml String = getContentsForImport(project, name + ".deploy", port, getServletContext() );
+		if (xml != "")
+			convertFromXMLForImport(xml, deploy);
+			debug("add imports");
+			if (deploy.imports._import != null)
+				for (n int from 1 to deploy.imports._import.getSize())
+					_import String = deploy.imports._import[n];
+					if(!filterDynamicLoadingIncludeFiles.containsKey(_import))
+						modules ::= new Module {
+							name = _import,
+							javascript = "",
+							moduleType = ModuleTypeLib.imports
+						};
+						filterDynamicLoadingIncludeFiles[_import] = 1;
+					end
+				end
+			end	
+		end
+	end
+	
+	function getContents(project String in, name String in, port int in, context ServletContext in ) returns(String)
+		try
+			return (filehandler.getContents(project, name, port, context));
+		onException (e AnyException)
+			SysLib.writeStderr("Error: "+filehandler.getURL(project, name, port)+" "+e.message);
+		end
+		return ("");
+	end
+	
+	private function getContentsForImport(project String in, name String in, port int in, context ServletContext in) returns(String)
+		try
+			return (filehandler.getContentsForImport(project, name, port, context));
+		onException (e AnyException)
+		end
+		return ("");
+	end
+	
+	function checkPropertiesFileExists(project String in, name String in, port int in) returns(boolean)
+		const veNotFoundText string = "document.write(\"Could not open";
+		length int = strlib.characterLen(veNotFoundText);
+		try
+			content string;
+			content = filehandler.getContents(project, name, port, getServletContext());
+			if(strlib.characterLen(content)>length)
+				if(content[1:length]==veNotFoundText)
+					return (false);
+				end
+			end
+		onException (e AnyException)
+			return (false);
+		end
+		return (true);
+	end
+		
+	function replaceAll(s String in, original String in, replacement String in) returns(String)
+		index int = strlib.indexOf(s, original);
+		len int = strlib.characterLen(s);
+		try
+			while (index > 0)
+				s = s[1 : index - 1] + replacement + s[index + 1: len];
+				index = strlib.indexOf(s, original);
+			end
+		onException (e AnyException)
+		end
+		return (s);
+	end
+	
+	function getLocale() returns(String)
+		return ("en_US");
+	end
+
+	/* Servlet Feature */
+	private function supportsServlet() returns (boolean)
+	  if( hasDetectedServletFeature )
+	  	return (isServletFeatureSupported);
+	  end
+	  
+	  try
+	    hasDetectedServletFeature = true;
+	    context Object = J2EELib.getContext();
+		if(context isa HttpServletRequest)
+			isServletFeatureSupported = true;
+			return(true);
+		end	    
+	  onException (e AnyException)
+	    return (false);
+	  end
+	  return (false);
+	end
+	
+	private function getServletContext() returns(ServletContext)
+		if( supportsServlet() )
+			session HttpSession = getHttpSession();
+			if(session != null)
+				return(session.getServletContext());
+			end
+		else
+			return (null);
+		end
+	end
+	
+	private function getHttpSession() returns(HttpSession)
+		request HttpServletRequest = getHttpServletRequest();
+		if(request != null)
+			return(request.getSession());
+		end
+	end
+	
+	private function getHttpServletRequest() returns(HttpServletRequest)
+		context Object = J2EELib.getContext();
+		if(context isa HttpServletRequest)
+			return(context as HttpServletRequest);
+		end
+	end
+	/* End of Servlet Feature */
+end
+
+Record LoadResult
+	names String[];
+	text String[];
+end
+
+record RuiDeploy { }
+	includes RUIDeploy_Include?; 
+	imports RUIDeploy_Import?; 
+	runtimePropertyFiles RUIDeploy_runtimePropertyFile?; 
+	referencedHandlers RUIDeploy_Referenced?;
+	propertyFiles RUIDeploy_propertyFile?; 
+end
+
+record RUIDeploy_runtimePropertyFile
+	runtimePropertyFile String[];
+end
+record RUIDeploy_propertyFile
+	propertyFile String[];
+end
+record RUIDeploy_Include
+	include String[];
+end
+record RUIDeploy_Import
+	_import String[];
+end
+record RUIDeploy_Referenced
+	referencedHandler String[];
+end

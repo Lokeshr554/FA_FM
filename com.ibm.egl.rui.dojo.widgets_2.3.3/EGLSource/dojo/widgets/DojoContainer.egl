@@ -1,0 +1,28 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.Widget;
+
+/*
+ * This widget serves as an abstraction for a Dojo widget that has children
+ * Subclasses are DojoMenu, DojoTabContainer, DojoTree, etc
+ * See DojoContainer.js for overwritten functions
+ */ 
+ExternalType DojoContainer extends DojoBase type JavaScriptObject {
+	relativePath = "dojo/widgets",
+	javaScriptName = "DojoContainer"
+}
+
+/*
+ * Function for Bidi operation
+ */
+function setBiDiMarkers ();
+	
+end

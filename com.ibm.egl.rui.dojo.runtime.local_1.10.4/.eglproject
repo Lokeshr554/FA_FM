@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource name="com.ibm.egl.rui.dojo.runtime.local_1.10.4">
+	<storedValue key="EGLProjectFeatureMask" value="16"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptDebugName" value="com_ibm_egl_rui_dojo_runtime_local_1_10_4JavaScriptBuildOptions"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptTargetName" value="com_ibm_egl_rui_dojo_runtime_local_1_10_4JavaScriptBuildOptions"/>
+	<storedValue key="EGLTargetRuntimeMask" value="3"/>
+	<storedValue key="EGLProjectMigrationVersion" value="8.0.0"/>
+	<storedValue key="EGLProjectSecondaryMigrationVersion" value="9.0"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptDebugPath" value="com.ibm.egl.rui.dojo.runtime.local_1.10.1/EGLSource/com_ibm_egl_rui_dojo_runtime_local_1_10_4.eglbld"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptTargetPath" value="com.ibm.egl.rui.dojo.runtime.local_1.10.1/EGLSource/com_ibm_egl_rui_dojo_runtime_local_1_10_4.eglbld"/>
+</resource>

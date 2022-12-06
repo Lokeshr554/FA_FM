@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE EGL PUBLIC "-//IBM Corporation, Inc.//DTD EGL Build Parts 6.0//EN" "">
+
+<EGL>
+<BuildDescriptor
+	name="com_ibm_egl_ruiJavaBuildOptions"
+	genProject="com.ibm.egl.rui_4.3.7"
+	system="WIN"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DERBY"
+	sqlValidationConnectionURL="jdbc:derby:E:\rbdws\v8.0\DynamicLoading\.metadata\.plugins\org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb/db/BirtSample"
+	sqlJDBCDriverClass="org.apache.derby.jdbc.EmbeddedDriver"
+	sqlDB="jdbc:derby:E:\rbdws\v8.0\DynamicLoading\.metadata\.plugins\org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb/db/BirtSample"
+	deploymentDescriptor="com_ibm_egl_rui"
+>
+</BuildDescriptor>
+<BuildDescriptor
+	name="com_ibm_egl_ruiJavaScriptBuildOptions"
+	genProject="com.ibm.egl.rui_4.3.7"
+	system="JAVASCRIPT"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DERBY"
+	sqlValidationConnectionURL="jdbc:derby:E:\rbdws\v8.0\DynamicLoading\.metadata\.plugins\org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb/db/BirtSample"
+	sqlJDBCDriverClass="org.apache.derby.jdbc.EmbeddedDriver"
+	sqlDB="jdbc:derby:E:\rbdws\v8.0\DynamicLoading\.metadata\.plugins\org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb/db/BirtSample"
+	deploymentDescriptor="com_ibm_egl_rui"
+>
+</BuildDescriptor>
+<BuildDescriptor
+	name="com_ibm_egl_ruiDebugBuildOptions"
+	genProject="com.ibm.egl.rui_4.3.7"
+	system="WIN"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DERBY"
+	sqlValidationConnectionURL="jdbc:derby:E:\rbdws\v8.0\DynamicLoading\.metadata\.plugins\org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb/db/BirtSample"
+	sqlJDBCDriverClass="org.apache.derby.jdbc.EmbeddedDriver"
+	sqlDB="jdbc:derby:E:\rbdws\v8.0\DynamicLoading\.metadata\.plugins\org.eclipse.birt.report.data.oda.jdbc.dbprofile.sampledb/db/BirtSample"
+	deploymentDescriptor="com_ibm_egl_rui"
+>
+</BuildDescriptor>
+</EGL>

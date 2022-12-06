@@ -1,0 +1,63 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+library InternalDateFormatter
+	use InternalMessageLib;
+	
+	util InternalFormattingUtil{};
+	
+	function format(input string in, format string in, typeChkMsgKey string in) returns(string)
+		if (input == "")
+			return("");
+		end
+		
+		if (format == "")
+			format = strlib.defaultDateFormat;
+		end
+		
+		try
+			dateInput date = input;
+			return(strlib.formatDate(dateInput, format));
+		onException(exception AnyException)
+			throw new RuntimeException {message = getRuntimeErrorMessage(typeChkMsgKey, "CRRUI2717E", [format]), messageId="CRRUI2717E"};
+		end
+	end
+	
+	function unformat(input string in, format string in, typeChkMsgKey string in) returns(string)
+		if (input == "")
+			return("");
+		end
+		
+		if (format == "")
+			format = strlib.defaultDateFormat;
+		end
+		
+		util InternalFormattingUtil{};
+		
+		savedFormat string = strlib.defaultDateFormat;
+		strlib.defaultDateFormat = format;
+		isValid boolean = util.isValidDateInput(input, format);
+		if (!isValid)
+			errorFormat string = strlib.defaultDateFormat;
+			strlib.defaultDateFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(typeChkMsgKey, "CRRUI2708E", [errorFormat]), messageId = "CRRUI2708E"};		
+		end
+		
+		try
+			result date = input;
+			strlib.defaultDateFormat = savedFormat;
+			return (result as string);
+		onException (exception AnyException)
+			errorFormat string = strlib.defaultDateFormat;
+			strlib.defaultDateFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(typeChkMsgKey, "CRRUI2708E", [errorFormat]), messageId = "CRRUI2708E"};		
+		end;
+	end
+end

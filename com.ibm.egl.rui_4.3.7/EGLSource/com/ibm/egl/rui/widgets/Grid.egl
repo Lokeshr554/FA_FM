@@ -1,0 +1,131 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+Handler Grid type RUIWidget {targetWidget=div, cssFile = "css/com.ibm.egl.rui.css" }
+
+	data any[]			 { @EGLProperty{ setMethod=setData, getMethod=getData } };
+	div Div { children = [] };
+	columns GridColumn[0];
+	behaviors CellBehavior[0];
+	headerBehaviors CellBehavior[0];
+	private reverseTextDirectionThis String = "No";
+	private textLayoutThis String = "Logical";	
+	
+	function setData(data any[] in)
+		this.data = data;
+		box Box { table { class = "EglRuiGridTable" } };
+		box.columns = columns.getSize();
+		for (c int from 1 to columns.getSize() by 1)
+			span Span { text = columns[c].name };
+			if (columns[c].displayName != "")
+				span.text = columns[c].displayName;
+			end
+			box.appendChild(span);
+			td Widget = box.lastRow.children[box.lastRow.children.getSize()];
+			td.class = "EglRuiGridHeader EglRuiAlignCenter";
+			td.setAttribute("width", Mathlib.max(40, columns[c].width));
+			td.logicalParent = this;
+			span.logicalParent = this;
+			if(this.textLayoutThis == "Visual" || this.reverseTextDirectionThis== "Yes")				
+				span.textLayout = this.textLayoutThis;
+				span.reverseTextDirection = this.reverseTextDirectionThis;				
+			end
+			for (k int from 1 to headerBehaviors.getSize() by 1)
+				headerBehaviors[k](this, td, null, 0, columns[c]);
+			end
+		end
+		for (n int from 1 to data.getSize() by 1)
+			for (c int from 1 to columns.getSize() by 1)
+				html HTML {};
+				val any = data[n][columns[c].name];
+				if (val == null)
+					html.text = "";
+				else
+					html.text = ""+val;
+				end
+				box.appendChild(html);
+				td Widget = box.lastRow.children[box.lastRow.children.getSize()];
+				td.class = "EglRuiGridCell";
+				td.logicalParent = this;
+				html.logicalParent = this;
+				if(this.textLayoutThis == "Visual" || this.reverseTextDirectionThis == "Yes")				
+					html.textLayout = this.textLayoutThis;
+					html.reverseTextDirection = this.reverseTextDirectionThis;
+				end			
+				for (k int from 1 to behaviors.getSize() by 1)
+					behaviors[k](this, td, data[n], n, columns[c]);
+				end
+			end
+		end 
+		div.children = [ box ];
+	end
+
+	function getData() returns(any[])
+		return (this.data);
+	end
+		
+	function getColumn(td Widget in) returns(GridColumn)
+		tr Widget = td.parent; 
+		cells Widget[] = tr.children;
+		for (n int from 1 to cells.getSize() by 1)
+			if (cells[n] == td)
+				return (columns[n]);
+			end
+		end
+		return (null);
+	end
+
+	function layout()
+		setData(this.data);
+	end
+	
+	function setReverseTextDirection( reverseTextDirection String in) { @Override }
+		this.reverseTextDirectionThis = reverseTextDirection;
+		setBiDiStyles();		
+	end
+	
+	function getReverseTextDirection() returns (String) { @Override }
+		return (this.reverseTextDirectionThis);
+	end	
+
+	function setTextLayout( textLayout String in) { @Override }
+		this.textLayoutThis = textLayout;
+		setBiDiStyles();
+	end
+	
+	function getTextLayout() returns (String) { @Override }
+		return (this.textLayoutThis);
+	end
+	
+	private function setBiDiStyles()
+		boxes Widget[] = div.getChildren();
+		if(boxes != null && boxes.getSize() != null && boxes.getSize() > 0)
+			box Box = boxes[1];						
+			children Widget[] = box.getChildren();
+			if(children.getSize() > 0)
+				for(i int from 1 to children.getSize() by 1)
+					//if (children[i].class == "EglRuiRadioGroupOptionName")
+						children[i].textLayout = this.textLayoutThis;
+						children[i].reverseTextDirection = this.reverseTextDirectionThis;
+					//end;
+				end
+			end
+		end
+	end
+end
+
+Record GridColumn
+	displayName String;
+	name String;
+	width int;
+end
+
+Delegate CellBehavior(grid Grid in, cell Widget in, row any in, rowNumber int in, column GridColumn in) 
+end

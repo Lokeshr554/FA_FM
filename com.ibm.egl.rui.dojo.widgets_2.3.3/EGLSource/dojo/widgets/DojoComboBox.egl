@@ -1,0 +1,72 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.Widget;
+
+/*
+ * A combo box widget..
+ *
+ * For more detail, see http://docs.dojocampus.org/dijit/form/ComboBox
+ */
+ExternalType DojoComboBox Extends DojoBase type JavaScriptObject{
+		relativePath = "dojo/widgets",
+        javaScriptName = "DojoComboBox",
+        @VEWidget{
+			category = "Display and Input",
+			template = "${typeName}{ values = [\"value1\",\"value2\",\"value3\"], value = \"value2\" }",
+			displayName = "ComboBox",
+			smallIcon = "icons/ctool16/dijit_combobox_pal16.gif",
+			largeIcon = "icons/ctool24/dijit_combobox_pal24.gif",
+			propertyFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+			propertyFilter = [ "class", "color", "x", "y", "cursor", "ariaLive", "ariaRole", "tabIndex" ],
+			eventFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+       		eventFilter  = ["onSelect","onScroll"],
+			provider = "Dojo"
+		},	
+		@MVCView{
+			retrieveViewHelper = getValueAsText,
+			publishHelper = setValueAsText
+		},
+		@VEDataTemplate{
+			dataTemplates = [
+				@DataTemplate{
+					name = "DojoComboBox",
+					dataMapping = @DataMapping {
+						forArray = false,
+						mappings = [MappingKind.TYPE_PRIMITIVE_ALL]
+					},
+					purposes = [PurposeKind.FOR_DISPLAY, PurposeKind.FOR_CREATE, PurposeKind.FOR_UPDATE],
+					template = "${widgetName} ${typeName:dojo.widgets.DojoComboBox} { values = [] };"
+				}
+			]
+		}
+	}
+
+	/*
+	 * the value of the input field
+	 */ 
+	value String { @JavaScriptProperty{ setMethod = "setValue" , getMethod = "getValue" }, @VEProperty{}  };
+
+	/*
+	 * the options the user can choose from
+	 */
+	values String[] { @JavaScriptProperty { getMethod= "getValues", setMethod= "setValues" }, @VEProperty{} };
+
+	/*
+	 * the maximum number of options to show when the user activates the combo
+	 */ 
+	pageSize int {@VEProperty};
+	
+	editable boolean {@JavaScriptProperty { getMethod= "getEditable", setMethod= "setEditable"}};
+
+	private function getValueAsText() returns(String);
+	private function setValueAsText(str String in);
+
+end

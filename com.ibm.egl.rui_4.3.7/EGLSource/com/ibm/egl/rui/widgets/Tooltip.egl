@@ -1,0 +1,110 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+Delegate
+	TooltipTextProvider(widget any in) returns(Box)
+end
+
+handler Tooltip type RUIWidget {onConstructionFunction = start}
+
+	provider TooltipTextProvider;
+	delay int = 400;
+	text String = null;
+	
+	private container Div { 
+		class = "EglRuiTooltip",
+		onMouseOver ::= enterTooltip,
+		onMouseOut ::= leaveTooltip
+	};
+	private shadow Shadow { div = container };
+	private tooltip Box { children = [shadow], visibility="hidden", zindex="2147483647" , position="absolute" };
+	private defaultTip Box { children = [ new HTML {} as Widget ] };
+	
+	private showJob Job { runFunction = showTooltip };
+	private hideJob Job { runFunction = hideTooltip };
+	private insideTarget boolean;
+	
+	function start()
+		document.body.appendChild(tooltip);
+	end 	
+	
+	function enable(widget Widget in)
+		widget.onMouseOver ::= activateTooltip;
+		widget.onMouseOut ::= deactivateTooltip;
+		widget.onClick ::= leaveTooltip;
+	end
+	
+	function deactivateTooltip(e Event in)
+		hideJob.schedule(delay);
+		insideTarget = false;
+	end
+	
+	function activateTooltip(e Event in)
+		insideTarget = true;
+		widget Widget = e.widget;
+		tip Box = null;
+		if (provider == null && text != null)
+			tip = defaultTip;
+			(tip.children[1] as HTML).text = text;
+		else
+			tip = provider(e.widget);
+		end
+		if (tip != null)
+			h int = 10;
+			if (widget.height != "auto")
+                hs string = widget.height;
+                if ( hs is Numeric )
+                    h = hs;
+                else
+                    // Handle the cases of values with unit, such as 10px, 10mm etc.
+                    // The unit is always 2 characters.
+                    len int = strLib.characterLen(hs);
+                    if ( len > 2 && hs[1:len - 2] is Numeric )
+                        h = hs[1:len - 2];
+                    end
+                end
+			end
+			y int = Mathlib.min(widget.y + h - 3, e.pageY + 10);		
+			container.removeChildren();
+			container.children = [tip as Widget];
+			container.opacity= "1.0";
+			tooltip.x = e.pageX ;
+			tooltip.y = y;
+			hideJob.cancel();
+			showJob.schedule(delay);
+		else
+			hideTooltip();
+		end
+	end
+	
+	function showTooltip()
+		if (insideTarget)
+			tooltip.visibility = "visible";
+		end
+	end
+	
+	function hideTooltip()
+		container.fadeOut(300, setInvisible);
+		insideTarget = false;
+	end
+	
+	function setInvisible()
+		container.opacity = "1.0";
+		tooltip.visibility = "hidden";
+	end
+	
+	function enterTooltip(e Event in)
+		hideJob.cancel();
+	end
+	function leaveTooltip(e Event in)
+		hideJob.schedule(200);
+	end
+	
+end

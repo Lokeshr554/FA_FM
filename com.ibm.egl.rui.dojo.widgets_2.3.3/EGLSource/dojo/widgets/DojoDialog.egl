@@ -1,0 +1,54 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.javascript.javascriptproperty;
+import egl.ui.rui.Widget;
+
+/*
+ * Show a popup dialog with title bar and close button. 
+ * The dialog can be dragged on the screen and is modal: it blocks all mouse events from going to other widgets
+ * 
+ * For more detail, see http://docs.dojocampus.org/dijit/Dialog
+ */ 
+ExternalType DojoDialog Extends DojoContainer type JavaScriptObject{
+		relativePath = "dojo/widgets",
+        javaScriptName = "DojoDialog"   
+	}
+	
+	/*
+	 * The tile of the dialog box.
+	 */ 
+	title string{ @JavaScriptProperty {}};
+	
+	/* 
+	 * This dialog can be dragged by the user
+	 */
+	draggable boolean;
+
+	/*
+	 * Call this function to show the dialog and add it to the document
+	 */
+	function showDialog();
+
+	/*
+	 * Call this function to hide the dialog and remove it from the document
+	 */
+	function hideDialog();
+	
+	/**
+	 * Sets the buttons to show on the dialog	
+	 */	
+	buttons DojoButton[] { @JavaScriptProperty {}};
+	
+	/*
+	 * Event handler notifying users when a this dialog is closed. 
+	 */
+	onClose EventHandler[] {@JavaScriptProperty, @VEEvent };
+end

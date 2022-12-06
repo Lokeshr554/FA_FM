@@ -1,0 +1,56 @@
+@CHARSET "ISO-8859-1";
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+@import url("basic.css");
+@import url("claro/claro.css");
+.EglRuiDataGridColumn1Cell {
+	position: relative;
+	left: 0;
+	z-index: 999;
+	background: #E5EDF4;
+}
+.EglRuiDataGridHeaderRow {
+	position: relative;
+	top: 0;
+}
+
+.EglRuiDataGridCheckBox {
+	position: relative;
+	left: 0;
+}
+
+.EglRuiDataGridHeaderCell.EglRuiDataGridColumn1Cell {
+	z-index: 1000;
+}
+
+/************ DojoUploader width and height support ***********/
+.dijitUploader {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	position: relative;
+}
+
+.dijitUploader > .dijitButtonNode{
+	width: 100%;
+	height: 100%;
+	box-sizing: inherit;
+	-webkit-box-sizing: inherit;
+}
+
+.dijitUploader > input {
+	height: 120%;
+	padding-right: 100%;
+}
+
+.dijitUploader .dijitButtonNode .dijitButtonContents {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-contents: center;
+}

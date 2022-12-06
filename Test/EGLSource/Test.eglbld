@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE EGL PUBLIC "-//IBM Corporation, Inc.//DTD EGL Build Parts 6.0//EN" "">
+
+<EGL>
+<BuildDescriptor
+	name="TestJavaBuildOptions"
+	genProject="Test"
+	system="WIN"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DB2"
+	sqlValidationConnectionURL="jdbc:db2://localhost:50000/SAMPLE"
+	sqlJDBCDriverClass="com.ibm.db2.jcc.DB2Driver"
+	sqlDB="jdbc:db2://localhost:50000/SAMPLE"
+	deploymentDescriptor="Test"
+>
+</BuildDescriptor>
+<BuildDescriptor
+	name="TestJavaScriptBuildOptions"
+	genProject="Test"
+	system="JAVASCRIPT"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DB2"
+	sqlValidationConnectionURL="jdbc:db2://localhost:50000/SAMPLE"
+	sqlJDBCDriverClass="com.ibm.db2.jcc.DB2Driver"
+	sqlDB="jdbc:db2://localhost:50000/SAMPLE"
+	deploymentDescriptor="Test"
+>
+</BuildDescriptor>
+<BuildDescriptor
+	name="TestDebugBuildOptions"
+	genProject="Test"
+	system="WIN"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DB2"
+	sqlValidationConnectionURL="jdbc:db2://localhost:50000/SAMPLE"
+	sqlJDBCDriverClass="com.ibm.db2.jcc.DB2Driver"
+	sqlDB="jdbc:db2://localhost:50000/SAMPLE"
+	deploymentDescriptor="Test"
+>
+</BuildDescriptor>
+</EGL>

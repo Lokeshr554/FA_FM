@@ -1,0 +1,25 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2013, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+ExternalType DojoDiagnostics type JavaScriptObject { 
+		relativePath="dojo/widgets",
+		javaScriptName="DojoDiagnostics"	
+	}
+
+	//
+	// This handler has no fields or functions. If you declare an instance of it in your code,
+	// diagnostics will be printed about startup time, Dojo provider being used, and what
+	// browser is used.
+	//
+	// This handler is written to help you with debugging Dojo applications.
+	// 
+ 
+end
+	

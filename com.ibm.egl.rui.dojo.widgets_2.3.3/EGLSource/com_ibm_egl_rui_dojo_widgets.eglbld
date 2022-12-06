@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE EGL PUBLIC "-//IBM Corporation, Inc.//DTD EGL Build Parts 6.0//EN" "">
+
+<EGL>
+<BuildDescriptor
+	name="com_ibm_egl_rui_dojo_widgetsJavaBuildOptions"
+	genProject="com.ibm.egl.rui.dojo.widgets_2.3.3"
+	system="WIN"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DB2"
+	sqlValidationConnectionURL="jdbc:db2://localhost:50000/SAMPLE"
+	sqlJDBCDriverClass="com.ibm.db2.jcc.DB2Driver"
+	sqlDB="jdbc:db2://localhost:50000/SAMPLE"
+	deploymentDescriptor="com_ibm_egl_rui_dojo_widgets"
+>
+</BuildDescriptor>
+<BuildDescriptor
+	name="com_ibm_egl_rui_dojo_widgetsJavaScriptBuildOptions"
+	genProject="com.ibm.egl.rui.dojo.widgets_2.3.3"
+	system="JAVASCRIPT"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DB2"
+	sqlValidationConnectionURL="jdbc:db2://localhost:50000/SAMPLE"
+	sqlJDBCDriverClass="com.ibm.db2.jcc.DB2Driver"
+	sqlDB="jdbc:db2://localhost:50000/SAMPLE"
+	deploymentDescriptor="com_ibm_egl_rui_dojo_widgets"
+>
+</BuildDescriptor>
+<BuildDescriptor
+	name="com_ibm_egl_rui_dojo_widgetsDebugBuildOptions"
+	genProject="com.ibm.egl.rui.dojo.widgets_2.3.3"
+	system="WIN"
+	J2EE="NO"
+	genProperties="GLOBAL"
+	genDataTables="YES"
+	dbms="DB2"
+	sqlValidationConnectionURL="jdbc:db2://localhost:50000/SAMPLE"
+	sqlJDBCDriverClass="com.ibm.db2.jcc.DB2Driver"
+	sqlDB="jdbc:db2://localhost:50000/SAMPLE"
+	deploymentDescriptor="com_ibm_egl_rui_dojo_widgets"
+>
+</BuildDescriptor>
+</EGL>

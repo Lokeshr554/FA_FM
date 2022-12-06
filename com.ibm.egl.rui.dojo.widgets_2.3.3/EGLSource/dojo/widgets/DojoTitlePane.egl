@@ -1,0 +1,55 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+/*
+ * A container widget.
+ *
+ * For more detail, see http://docs.dojocampus.org/dijit/TitlePane
+ */
+import egl.javascript.javascriptproperty;
+import egl.ui.rui.Widget;
+
+ExternalType DojoTitlePane Extends DojoContainer type JavaScriptObject{
+		relativePath = "dojo/widgets",
+		javaScriptName = "DojoTitlePane",
+		@VEWidget{
+			category = "Layout",
+			template = "${typeName}{ title = \"Title Pane\", isOpen=true, duration=1000, width=\"500\", children = [ new ${typeName:com.ibm.egl.rui.widgets.Div} {} ] }",
+			displayName = "TitlePane",
+			smallIcon = "icons/ctool16/titlepane_pal16.gif",
+			largeIcon = "icons/ctool24/dojox_dojodata_pal24.gif",
+			propertyFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+			propertyFilter = [ "class", "backgroundColor", "x", "y", "disabled", "ariaLive", "ariaRole", "tabIndex" ],
+			eventFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+       		eventFilter  = ["onChange","onSelect", "onScroll"],
+			provider = "Dojo"	
+		}
+	}
+
+	/*
+	 * Indicate whether the title pane is open or not
+	 */
+	isOpen Boolean {@JavaScriptProperty { getMethod="getOpen", setMethod="setOpen"}, @VEProperty};
+
+	/*
+	 * The title for the title pane. 
+	 */
+	title String {@VEProperty, @JavaScriptProperty};
+	
+	/*
+	 * Animation duration in milliseconds
+	 */
+	duration int {@VEProperty};
+	
+	/*
+	 * Toggle pane between open and close status
+	 */ 
+	function toggle();
+end

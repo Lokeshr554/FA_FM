@@ -1,0 +1,109 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+library InternalValidators
+	util InternalFormattingUtil{};
+    validHexDigits string = "0123456789abcdefABCDEF";
+
+    function isNotEmpty(s string in, message string in) returns(string?)
+        if(s != "")
+            return(null);
+        else
+            return(getReturnMessage(message, "CRRUI2700E", null));
+        end
+    end
+
+    function isDecimalDigits(text string in, message string in) returns(string?)
+    	len int = strlib.characterLen(text);
+    	decimalSeparator string = util.getDecimalSeparator();
+    	groupingSeparator string = util.getGroupingSeparator();
+    	
+    	for (i int from 1 to len)
+    		s string = text[i:i];
+    		if ( (s < "0" || s > "9") && s != "-" && s != decimalSeparator && s != groupingSeparator )
+    			return(getReturnMessage(message, "CRRUI2702E", null));
+    		end
+    	end
+    	
+    	return(null);
+    end
+
+    function isHexDigits(s string in, message string in) returns(string?)
+        strLen int = StrLib.characterLen(s);
+        for(i int from 1 to strLen)
+            if(strlib.indexOf(validHexDigits, s[i : i]) == 0)
+                return(getReturnMessage(message, "CRRUI2712E", null));
+            end
+        end
+        return(null);
+    end
+
+    function checkMinimumInput(s string in, minLength int in, message string in) returns(string?)
+        if(StrLib.characterLen(s) >= minLength)
+            return(null);
+        else
+            return(getReturnMessage(message, "CRRUI2705E", null));
+        end
+    end
+
+    function checkValidValues(s string in, validValues any[][] in, message string in) returns(string?)
+        input string = strlib.clip(s, 0);
+        length int = validValues.getSize();
+        if(validValues[1][1] isa string? || validValues[1][1] isa string)
+            for(i int from 1 to length)
+                if(validValues[i].getSize() == 1)
+                    if(input == strlib.clip(validValues[i][1], 0))
+                        return(null);
+                    end
+                else
+                    if(input >= strlib.clip(validValues[i][1], 0))
+                        upper string = strlib.clip(validValues[i][2], 0);
+                        if(s <= upper)
+                            return(null);
+                        end
+
+                        len int = strlib.characterLen(upper);
+                        if(strlib.characterLen(input) > len)
+                            if(input[1 : len] <= upper)
+                                return(null);
+                            end
+                        end
+                    end
+                end
+            end
+        else
+            for(i int from 1 to length)
+                if(validValues[i].getSize() == 1)
+                    if(mathlib.stringAsDecimal(input) ==
+                            mathlib.stringAsDecimal(validValues[i][1] as string))
+                        return(null);
+                    end
+                else
+                    if(mathlib.stringAsDecimal(input) >=
+                            mathlib.stringAsDecimal(validValues[i][1] as string) &&
+                            mathlib.stringAsDecimal(input) <=
+                                    mathlib.stringAsDecimal(validValues[i][2] as string))
+                        return(null);
+                    end
+                end
+            end
+        end
+
+        return(getReturnMessage(message, "CRRUI2716E", null));
+    end
+
+    private function getReturnMessage(message string? in, defaultKey string in, inserts string[] in) returns(string)
+        if(!(message == null || message == ""))
+            return(message);
+        else
+            return(Syslib.getMessage(defaultKey, inserts));
+        end
+    end
+end

@@ -1,0 +1,430 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+library InternalNumericFormatter
+	use InternalMessageLib;
+	util InternalFormattingUtil{};
+	
+	private const PARSE_ERROR String = "CRRUI2719E";
+	private const EDIT_INVALID_DATE_TIME_ERR String = "CRRUI2708E";
+	private const BOOLEAN_ERROR String = "CRRUI2710E";
+
+	function format(input string in, dateFormat string in, timeFormat string in, isBoolean boolean in,
+			zeroFormat boolean in, fillChar string in, sign SignKind in, currency boolean in,
+			currencySymbol string in, numericSeparator boolean in, itemLength int in,
+			itemDecimals int in, itemType string in, msgKey string in) returns(string)
+		if (input == "")
+			return("");
+		end
+		
+		if (dateFormat != "")
+			return(asDate(input, dateFormat, itemLength, msgKey));
+		end
+		if (timeFormat != "")
+			return(asTime(input, timeFormat, msgKey));
+		end
+		
+		if (!zeroFormat && mathlib.stringAsDecimal(input) == 0)
+			if (fillChar != " " && fillChar != "" && itemType != "F" && itemType != "f")
+				result string;
+				integerLength int = itemLength - itemDecimals;
+				for (i int from 1 to integerLength by 1)
+					result += fillChar;
+				end
+				return(result);
+			end
+			return("");
+		end
+		
+		result string = input;
+		isNegative boolean = result[1:1] == "-";
+		if (isNegative)
+			result = result[2:strlib.characterLen(result)];
+		end
+		
+		preDecimal string;
+		postDecimal string;
+		decimalIndex int = strlib.indexOf(result, ".");
+		if (decimalIndex > 1)
+			preDecimal = result[1:decimalIndex - 1];
+			if (strlib.characterLen(result) > decimalIndex)
+				postDecimal = result[decimalIndex + 1:strlib.characterLen(result)];
+			end 
+		else
+			if (decimalIndex == 1)
+				if (strlib.characterLen(result) > 1)
+					postDecimal = result[2:strlib.characterLen(result)];
+				end 
+			else
+				preDecimal = result;
+			end
+		end
+		
+		if (numericSeparator)
+			separatorChar string = util.getGroupingSeparator();
+			for (i int from strlib.characterLen(preDecimal) - 3 to 1 decrement by 3)
+				preDecimal = preDecimal[1:i] + separatorChar + preDecimal[i+1:strlib.characterLen(preDecimal)];
+			end
+		end
+		
+		if (itemDecimals > 0)
+			if (itemType != "f" && itemType != "F")
+				if (strlib.characterLen(postDecimal) > itemDecimals)
+					postDecimal = postDecimal[1:itemDecimals];
+				else
+					while (strlib.characterLen(postDecimal) < itemDecimals)
+						postDecimal += "0";
+					end
+				end
+			end
+			decimalIndex = strlib.characterLen(preDecimal) + 1;
+			result = preDecimal + util.getDecimalSeparator() + postDecimal;
+		else
+			decimalIndex = 0;
+			result = preDecimal;
+		end
+		
+		if (fillChar != " " && fillChar != "" && itemType != "F" && itemType != "f")
+			start int;
+			if (decimalIndex != 0)
+				start = decimalIndex;
+			else
+				start = strlib.characterLen(result) + 1;
+			end
+			
+			integerLength int = itemLength - itemDecimals;
+			for (i int from start to integerLength by 1)
+				result = fillChar + result;
+			end
+		end
+		
+		if (currency)
+			if (currencySymbol == "")
+				currencySymbol = util.getCurrencySymbol();
+			end
+			result = currencySymbol + result;
+		end
+		
+		case (sign)
+			when(SignKind.leading)
+				if (isNegative)
+					result = "-" + result;
+				end
+			when(SignKind.trailing)
+				if (isNegative)
+					result += "-";
+				else
+					result += "+";
+				end
+			when(SignKind.parens)
+				if (isNegative)
+					result = "(" + result + ")";
+				end
+		end
+		
+		return(result);
+	end
+	
+	private function asDate(input string in, format string in, itemLength int in, msgKey string in) returns(string)
+		if (mathlib.stringAsDecimal(input) == 0)
+			return("");
+		end
+		
+		savedFormat string = strlib.defaultDateFormat;
+		try
+			strlib.defaultDateFormat = getInternalDateFormat(itemLength);
+			
+			sizeDifference int = strlib.characterLen(strlib.defaultDateFormat) - strlib.characterLen(input);
+			if (sizeDifference < 0)
+				input = input[-sizeDifference + 1:strlib.characterLen(input)];
+			else
+				if (sizeDifference != 0)
+					for (i int from 1 to sizeDifference)
+						input = "0" + input;
+					end
+				end
+			end
+			
+			d date = input;
+			result string = StrLib.formatDate(d, format);
+			strlib.defaultDateFormat = savedFormat;
+			return(result);
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultDateFormat;
+			strlib.defaultDateFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, EDIT_INVALID_DATE_TIME_ERR, [errorFormat]), messageId = EDIT_INVALID_DATE_TIME_ERR};
+		end
+	end
+	
+	private function asTime(input string in, format string in, msgKey string in) returns(string)
+		if (mathlib.stringAsDecimal(input) == 0)
+			return("");
+		end
+		
+		savedFormat string = strlib.defaultTimeFormat;
+		try
+			strlib.defaultTimeFormat = "HHmmss";
+			
+			sizeDifference int = strlib.characterLen(strlib.defaultTimeFormat) - strlib.characterLen(input);
+			if (sizeDifference < 0)
+				input = input[-sizeDifference + 1:strlib.characterLen(input)];
+			else
+				if (sizeDifference != 0)
+					for (i int from 1 to sizeDifference)
+						input = "0" + input;
+					end
+				end
+			end
+			
+			t time = input;
+			result string = StrLib.formatTime(t, format);
+			strlib.defaultTimeFormat = savedFormat;
+			return(result);
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultTimeFormat;
+			strlib.defaultTimeFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, EDIT_INVALID_DATE_TIME_ERR, [format]), messageId = EDIT_INVALID_DATE_TIME_ERR};
+		end
+	end
+	
+	function unformat(input string in, dateFormat string in, timeFormat string in, isBoolean boolean in,
+			zeroFormat boolean in, fillChar string in, sign SignKind in, currency boolean in,
+			currencySymbol string in, numericSeparator boolean in, itemLength int in,
+			itemDecimals int in, itemType string in, msgKey string in) returns(string)
+		
+		input = strlib.clip(input, 0);
+		if (dateFormat != "")
+			return(fromDate(input, dateFormat, isBoolean, itemLength, itemDecimals, itemType, msgKey));
+		end
+		if (timeFormat != "")
+			return(fromTime(input, timeFormat, isBoolean, itemLength, itemDecimals, itemType, msgKey));
+		end
+		
+		return(unformatAndConvertToNumber(input, isBoolean, fillChar, sign, currency, currencySymbol,
+				numericSeparator, itemLength, itemDecimals, itemType, msgKey));
+	end
+	
+	private function fromDate(input string in, format string in, isBoolean boolean in, itemLength int in,
+			itemDecimals int in, itemType string in, msgKey string in) returns(string)
+		if (input == "")
+			return(convertToNumber("0", isBoolean, itemLength, itemDecimals, itemType, msgKey));
+		end
+		if (input == "0")
+			throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, EDIT_INVALID_DATE_TIME_ERR, [format]), messageId = EDIT_INVALID_DATE_TIME_ERR};
+		end
+		
+		result string;
+		savedFormat string = strlib.defaultDateFormat;
+		try
+			strlib.defaultDateFormat = format;
+			d date = input;
+			result = StrLib.formatDate(d, getInternalDateFormat(itemLength));
+			strlib.defaultDateFormat = savedFormat;
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultDateFormat;
+			strlib.defaultDateFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, EDIT_INVALID_DATE_TIME_ERR, [errorFormat]), messageId = EDIT_INVALID_DATE_TIME_ERR};
+		end
+		return(convertToNumber(result, isBoolean, itemLength, itemDecimals, itemType, msgKey));
+	end
+	
+	private function fromTime(input string in, format string in, isBoolean boolean in, itemLength int in,
+			itemDecimals int in, itemType string in, msgKey string in) returns(string)
+		if (input == "")
+			return(convertToNumber("0", isBoolean, itemLength, itemDecimals, itemType, msgKey));
+		end
+		if (input == "0")
+			throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, EDIT_INVALID_DATE_TIME_ERR, [format]), messageId = EDIT_INVALID_DATE_TIME_ERR};
+		end
+		
+		result string;
+		savedFormat string = strlib.defaultTimeFormat;
+		try
+			strlib.defaultTimeFormat = format;
+			t time = input;
+			result = StrLib.formatTime(t, "HHmmss");
+			strlib.defaultTimeFormat = savedFormat;
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultTimeFormat;
+			strlib.defaultTimeFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, EDIT_INVALID_DATE_TIME_ERR, [errorFormat]), messageId = EDIT_INVALID_DATE_TIME_ERR};
+		end
+		return(convertToNumber(result, isBoolean, itemLength, itemDecimals, itemType, msgKey));
+	end
+	
+	private function unformatAndConvertToNumber(input string in, isBoolean boolean in, fillChar string? in,
+			sign SignKind in, currency boolean in, currencySymbol string in, numericSeparator boolean in,
+			itemLength int in, itemDecimals int in, itemType string in, msgKey string in) returns(string)
+		
+		if (fillChar != " " && fillChar != "")
+			while (strlib.indexOf(input, fillChar) == 1)
+				input = input[2:strlib.characterLen(input)];
+			end
+		end
+		
+		if (input == "")
+			return(convertToNumber("0", isBoolean, itemLength, itemDecimals, itemType, msgKey));
+		end
+		
+		if (currency)
+			if (currencySymbol == "")
+				currencySymbol = util.getCurrencySymbol();
+			end
+			removeSubstring(input, currencySymbol);
+		end
+		
+		if (numericSeparator)
+			separatorChar string = util.getGroupingSeparator();
+			while (removeSubstring(input, separatorChar))
+			end
+		end
+		
+		length int = strlib.characterLen(input);
+		if (length != 0)
+			case (sign)
+				when(SignKind.parens)
+					if (input[1:1] == "(")
+						input[1:1] = "-";
+					end
+					if (input[length:length] == ")")
+						if (length == 1)
+							input = "";
+						else
+							input = input[1:length - 1];
+						end
+					end
+				when(SignKind.trailing)
+					if (input[length:length] == "+")
+						if (length == 1)
+							input = "";
+						else
+							input = input[1:length - 1];
+						end
+					else
+						if (input[length:length] == "-")
+							if (length == 1)
+								input = "";
+							else
+								input = "-" + input[1:length - 1];
+							end
+						end
+					end
+				when(SignKind.leading)
+					if (input[1:1] == "+")
+						if (length == 1)
+							input = "";
+						else
+							input = input[2:length];
+						end
+					end
+			end
+		end
+		
+		decimalSeparator string = util.getDecimalSeparator();
+		if (decimalSeparator != ".")
+			index int = strlib.indexOf(input, decimalSeparator);
+			if (index != 0)
+				input[index:index] = ".";
+			end
+		end
+		
+		if (input == "")
+			input = "0";
+		end
+		return(convertToNumber(input, isBoolean, itemLength, itemDecimals, itemType, msgKey));
+	end
+	
+	private function removeSubstring(input string inOut, substring string in) returns(boolean)
+		if (substring == "")
+			return(false);
+		end
+		
+		index int = strlib.indexOf(input, substring);
+		if (index != 0)
+			inputLength int = strlib.characterLen(input);
+			substringLength int = strlib.characterLen(substring);
+			if (index == 1)
+				input = input[1 + substringLength:inputLength];
+			else
+				if (index + substringLength - 1 == inputLength)
+					input = input[1:index - 1];
+				else
+					input = input[1:index - 1] + input[index + substringLength:inputLength];
+				end
+			end
+			return(true);
+		end
+		return(false);
+	end
+	
+	private function convertToNumber(input string in, isBoolean boolean in, itemLength int in,
+			itemDecimals int in, itemType string in, msgKey string in) returns(string)
+		msg String;
+		
+		if (itemDecimals == 0 && itemType != "F" && itemType != "f")
+			if (input[1:1] == "-")
+				if (input[2:strlib.characterLen(input)] not numeric)
+					throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, PARSE_ERROR, []), messageId = PARSE_ERROR};				
+				end
+			else
+				if (input not numeric)
+					throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, PARSE_ERROR, []), messageId = PARSE_ERROR};			
+				end
+			end
+		end
+		
+		isOneOrZero boolean;
+		try
+			case (itemType)
+				when("f")
+					temp smallfloat = input;
+					isOneOrZero = temp == 0 || temp == 1;
+				when("F")
+					temp float = input;
+					isOneOrZero = temp == 0 || temp == 1;
+				when("I")
+					temp int = input;
+					isOneOrZero = temp == 0 || temp == 1;
+				when("i")
+					temp smallint = input;
+					isOneOrZero = temp == 0 || temp == 1;
+				when("B")
+					temp bigint = input;
+					isOneOrZero = temp == 0 || temp == 1;
+				when("b","N","n","9","d","p")
+					result any = MathLib.stringAsDecimal(input);
+					if (result == null || !util.decimalValueIsValid(result, itemLength, itemDecimals))
+						throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, PARSE_ERROR, []), messageId = PARSE_ERROR};
+					end
+					isOneOrZero = MathLib.stringAsDecimal(input) == 0 || MathLib.stringAsDecimal(input) == 1;
+			end
+		onException(exception AnyException)
+			throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, PARSE_ERROR, []), messageId = PARSE_ERROR};
+		end
+		
+		if (isBoolean && !isOneOrZero)
+			throw new RuntimeException {message = getRuntimeErrorMessage(msgKey, BOOLEAN_ERROR, []), messageId = BOOLEAN_ERROR};
+		end
+		
+		return(input);
+	end
+	
+	private function getInternalDateFormat(itemLength int in) returns(string)
+		case (itemLength)
+			when(5,7)
+				//This should be caught by calling functions and made more "user friendly"
+				throw new RuntimeException {message = "Unsupported dateformat length"};
+			when(6)
+				return("yyMMdd");
+			otherwise
+				return("yyyyMMdd");
+		end
+	end
+end

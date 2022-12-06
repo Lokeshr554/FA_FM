@@ -1,0 +1,12 @@
+<deploy package="com.ibm.egl.rui.widgets" partName="FloatLeft" partType="RUIWidget" version="2">
+	<buildDescriptors>
+		<buildDescriptor name="com_ibm_egl_ruiJavaScriptBuildOptions" fileName="\com.ibm.egl.rui_4.3.7\EGLSource\com_ibm_egl_rui.eglbld" egldd="" genProject="com.ibm.egl.rui_4.3.7"/>
+	</buildDescriptors>
+	<includes>
+		<include>com/ibm/egl/rui/widgets/FloatLeft.js</include>
+	</includes>
+	<runtimePropertyFiles>
+		<runtimePropertyFile>rununit</runtimePropertyFile>
+	</runtimePropertyFiles>
+	<ruiHandler/>
+</deploy>

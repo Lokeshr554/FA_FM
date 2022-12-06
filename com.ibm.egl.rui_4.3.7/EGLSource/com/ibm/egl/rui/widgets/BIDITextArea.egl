@@ -1,0 +1,169 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+handler BIDITextArea type RUIWidget{tagName="textarea", onConstructionFunction = start, cssFile = "css/com.ibm.egl.rui.css",
+	@VEWidget{
+		category = "Display and Input",
+		template = "${typeName}{}",
+		smallIcon = "icons/ctool16/textarea.gif",
+		largeIcon = "icons/ctool24/textarea.gif"
+	} }
+
+	private savedBackgroundColor string;
+	
+	text String { @EGLProperty { getMethod=getText, setMethod=setText }, @VEProperty{} };
+	readOnly boolean {@EGLProperty {getMethod=getReadOnly, setMethod=setReadOnly}, @VEProperty{}};
+	numRows Int { @EGLProperty { getMethod=getNumRows, setMethod=setNumRows }, @VEProperty{} };
+	numColumns Int { @EGLProperty { getMethod=getNumColumns, setMethod=setNumColumns }, @VEProperty{} };
+
+	private reverseTextDirectionThis String = "No";
+	private textLayoutThis String = "Logical";
+	private widgetOrientationThis String = "";
+	private handlers VisualHandlers = null;
+				
+	private buffer string[0];
+	private redraw boolean = true;
+	private savedEnableSelection boolean;
+	
+	function start()
+		onFocusGained ::= enableSelection;
+		onFocusLost ::= disableSelection;
+	end
+	
+	function enableSelection(e Event in)
+		savedEnableSelection = RUILib.getTextSelectionEnabled();
+		RUILib.setTextSelectionEnabled(true);
+	end
+	
+	function disableSelection(e Event in)
+		RUILib.setTextSelectionEnabled(savedEnableSelection);
+	end
+	
+	function append(text String in)
+		if(redraw)
+			setText(getText() + text);
+		else
+			buffer.appendElement(text);
+		end
+	end
+	
+	function setRedraw(draw boolean in)
+		redraw = draw;
+		bufSize int = buffer.getSize();
+		if(redraw && bufSize > 0)
+			s string;
+			for(i int from 1 to bufSize)
+				s += buffer[i] + "\n";
+			end
+			append(s);
+			buffer = new string[0];
+		end
+	end
+
+	function getNumRows() returns(int)
+		numRows = getAttribute("rows") as int;
+		return( numRows);
+	end
+	
+	function setNumRows(rows int in)
+		numRows = rows;
+		setAttribute("rows", rows);
+	end
+	
+	function getNumColumns() returns(int)
+		numColumns = getAttribute("cols") as int;
+		return(numColumns);
+	end
+	
+	function setNumColumns(cols int in)
+		numColumns = cols;
+		setAttribute("cols", cols);
+	end
+	
+	private function setText(txt string in)
+		text = txt;
+		setAttribute("value", txt);
+		reverseText();			
+	end
+	
+	private function getText() returns (string)
+		reverseText();		
+		text = getAttribute("value");
+		return (text);
+	end
+	
+	private function getReadOnly() returns(boolean)
+		return(readOnly);
+	end
+
+	private function setReadOnly(ro boolean in)
+		readOnly = ro;
+		if(ro)
+			setAttribute("readOnly", "true");
+			savedBackgroundColor = backgroundColor;
+			backgroundColor = null;
+			class = "EglRuiBIDITextAreaReadOnly";
+		else
+			setAttribute("readOnly", "");
+			backgroundColor = savedBackgroundColor;
+			class = "EglRuiBIDITextArea";
+		end
+	end
+
+	function setReverseTextDirection( reverseTextDirection String in) { @Override }
+		this.reverseTextDirectionThis = reverseTextDirection;
+		reverseText();		
+	end
+	
+	function getReverseTextDirection() returns (String) { @Override }
+		return (this.reverseTextDirectionThis);
+	end	
+
+	function getWidgetOrientation() returns (String) { @Override }
+		return (this.widgetOrientationThis);
+	end
+	
+	function setWidgetOrientation(widgetOrientation String in) { @Override }
+		this.widgetOrientationThis = widgetOrientation;
+		setBidiStyles();		
+	end
+			
+	function setTextLayout(textLayout String in) { @Override }
+		this.textLayoutThis = textLayout;
+		setBidiStyles();			
+
+		if(handlers == null)
+			handlers = new VisualHandlers{};
+		end
+		handlers.AttachHandlers(this);
+		reverseText();			
+	end
+		
+	function getTextLayout() returns (String) { @Override }
+		return (this.textLayoutThis);
+	end
+	
+	function setBidiStyles()
+		isVisual boolean = this.textLayoutThis == "Visual";
+		isWidgetOrientationRTL boolean = this.widgetOrientationThis == "RTL";		
+		this.setBiDiStyles(isVisual,isWidgetOrientationRTL);		
+	end
+	
+	function reverseText()
+		isVisual boolean = this.textLayoutThis == "Visual";
+		isReverseDirection boolean = this.reverseTextDirectionThis == "Yes";					
+		if(isVisual && isReverseDirection)
+			if(handlers == null)
+				handlers = new VisualHandlers{};
+			end		
+			handlers.ReverseText(this);
+		end
+	end
+end

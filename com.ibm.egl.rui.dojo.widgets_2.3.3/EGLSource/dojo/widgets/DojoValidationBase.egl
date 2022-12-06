@@ -1,0 +1,36 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.Widget;
+
+Delegate ValidPatternProvider(constraints dictionary in) returns (string) end
+Delegate Validator(input String in, constraints dictionary in) returns(string?) end
+/*
+ * This widget serves as an abstraction for a Dojo widget that has validation support.
+ * Subclasses are DojoTextField, DojoDateTextBox, DojoTimeTextBox and DojoCurrencyTextBox etc.
+ * 
+ * This is an internal type. Do not instantiate directly.
+ */ 
+ExternalType DojoValidationBase extends DojoTextBase type JavaScriptObject {
+	relativePath = "dojo/widgets",
+	javaScriptName = "DojoValidationBase"
+}	
+	placeHolder string { @JavaScriptProperty, @VEProperty };
+	promptMessage string { @JavaScriptProperty, @VEProperty };	
+	inputRequired boolean { @JavaScriptProperty, @VEProperty };
+	validateOnlyIfModified boolean;
+	inputRequiredMessage string { @JavaScriptProperty, @VEProperty };	
+	
+	tooltipPosition string[] { @JavaScriptProperty };
+	
+	constraints Dictionary { @JavaScriptProperty };
+	validators Validator[] { @JavaScriptProperty };
+	function reset();
+end

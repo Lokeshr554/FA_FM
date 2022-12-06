@@ -1,0 +1,76 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+import egl.core.IRest;
+
+handler HTML type RUIWidget{ tagName = "div", onConstructionFunction = start,
+		@VEWidget{
+				category = "Display and Input",
+				template = "${typeName}{ text=\"HTML\" }",
+				smallIcon = "icons/ctool16/html.gif",
+				largeIcon = "icons/ctool24/html.gif"
+			}   }
+
+	text String { @EGLProperty { getMethod=getText, setMethod=setText }, @VEProperty{} };
+	src String { @EGLProperty { getMethod=getSrc, setMethod=setSrc }, @VEProperty{} };
+	
+	private contextURL String;
+	private widgetOrientationThis String = "";
+	
+	function start()
+		location String = document.location;
+		index0 int = strLib.indexOf(location, "//") ;
+		index0 = strLib.indexOf(location, "/", index0 + 2);
+		index1 int = strLib.indexOf(location, "/", index0 + 1);
+		if (index1 != 0)
+			index0 = index1;
+		end
+	    contextURL = location[1:index0];
+	end
+	
+	function setText(text string in)
+		this.text = text;
+		innerHTML = text;
+	end
+	
+	function getText() returns (string)
+		return (this.text);
+	end
+
+	function setSrc(src string in)
+		restService IRest{@restBinding{}};
+		if (strLib.lowerCase(src[1:4]) != "http")
+            call restService.invokeGet(contextURL + src) returning to setText;
+        else
+        	call restService.invokeGet(src) returning to setText;
+		end
+		this.src = src;
+	end
+	
+	function getSrc() returns (string)
+		return (src);
+	end
+
+	function getWidgetOrientation() returns (String) { @Override }
+		return (this.widgetOrientationThis);		
+	end
+	
+	function setWidgetOrientation(widgetOrientation String in) { @Override }
+		this.widgetOrientationThis = widgetOrientation;	
+		if(widgetOrientation == "RTL")
+			this.style = "text-align: right;";
+			if(this.getTextLayout() != "Visual")
+				this.setAttribute("dir", "ltr");
+			end				
+		else
+			this.style = "text-align: left;";		
+		end
+	end
+end

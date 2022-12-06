@@ -1,0 +1,23 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2013, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+library MVCLib type BasicLibrary {}
+
+	private currentController Controller = null;
+
+	function getCurrentContext() returns(Controller)
+		return(currentController);
+	end
+	
+	function setCurrentContext(acontroller Controller in)
+		this.currentController = acontroller;
+	end
+	
+end

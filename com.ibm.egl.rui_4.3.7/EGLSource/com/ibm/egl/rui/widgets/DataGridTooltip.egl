@@ -1,0 +1,36 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+Delegate
+	DataGridTooltipTextProvider(row any in, fieldName String in, td Widget in) returns(Box)
+end
+
+handler DataGridTooltip type BasicHandler { }
+
+	provider DataGridTooltipTextProvider;
+	grid DataGrid;
+	
+	private tooltip ToolTip { provider = getTooltipContents };
+	
+	function setTooltips(grid DataGrid in, td Widget in, row any in, dataIndex int in, column DataGridColumn in)
+		td.setAttribute("enablePropagation", true);
+		tooltip.enable(td);
+		this.grid = grid;
+	end
+	
+	function getTooltipContents(widget any in) returns(Box)
+		td Widget = widget;
+		row any = grid.data[td.getAttribute("row")];
+		column DataGridColumn = grid.getColumn(td);
+		tip Box = provider(row, column.name, td);
+		return(tip);
+	end
+	
+end

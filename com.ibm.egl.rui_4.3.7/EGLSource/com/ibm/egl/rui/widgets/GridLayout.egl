@@ -1,0 +1,403 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+import egl.ui.rui.Widget;
+
+handler GridLayout type RUIWidget{targetWidget = table, cssFile = "css/com.ibm.egl.rui.css", 
+    @VEWidget{
+	    category = "Layout",
+		template = "${typeName}{ cellPadding = 4, rows = 3, columns = 3 }",
+		smallIcon = "icons/ctool16/gridlayout.gif",
+		largeIcon = "icons/ctool24/gridlayout.gif",
+		container = @VEContainer{layoutDataType = "${typeName:com.ibm.egl.rui.widgets.GridLayoutData}{ row = ${row}, column = ${column} }"}
+	},
+	@VEDataTemplate{
+		dataTemplates = [
+			@DataTemplate{
+				name = "GridLayout",
+				dataMapping = @DataMapping {
+					forArray = false,
+					isContainer = true,
+					mappings = [MappingKind.TYPE_PRIMITIVE_ALL, 
+								MappingKind.TYPE_RECORD_ALL]
+				},
+				purposes = [PurposeKind.FOR_DISPLAY, PurposeKind.FOR_UPDATE, PurposeKind.FOR_CREATE],
+				template = "${widgetName} ${typeName:com.ibm.egl.rui.widgets.GridLayout} { rows = ${rows}, columns = ${columns}, cellPadding = 4, children = [ ${childWidgets} ] };",
+				childLayoutDataTemplate = "layoutData = new ${typeName:com.ibm.egl.rui.widgets.GridLayoutData} { row = ${row}, column = ${column} }",
+				childNameLabelTemplate = "${nameLabelName} ${typeName:com.ibm.egl.rui.widgets.TextLabel} { text=\"${labelText}\" };",
+				childControllerTemplate = "${controllerName} ${typeName:com.ibm.egl.rui.mvc.Controller} { @${typeName:com.ibm.egl.rui.mvc.MVC} {model = ${bindingName}, view = ${widgetName} as Widget} };",
+				childControllerValidStateSetterTemplate = "validStateSetter = ${validStateSetterName}",
+				childControllerPublishMessageHelperTemplate = "publishMessageHelper = null",
+				childErrorLabelTemplate = "${errorLabelName} ${typeName:com.ibm.egl.rui.widgets.TextLabel} { };",
+				childFormFieldTemplate = "${formFieldName} ${typeName:com.ibm.egl.rui.mvc.FormField} { controller = ${controllerName}, nameLabel = ${nameLabelName}, errorLabel = ${errorLabelName}};",
+				formManagerTemplate = "${formManagerName} ${typeName:com.ibm.egl.rui.mvc.FormManager} {entries = [ ${formFields} ] };\n" + 
+									  "function ${formManagerName}_Submit(event Event in)\n" +
+									  "\tif(${formManagerName}.isValid())\n"+
+									  "\t\t${formManagerName}.commit();\n" +
+									  "\tend\n"+
+									  "end\n\n" +
+									  "function ${formManagerName}_Publish(event Event in)\n" +
+									  "\t${formManagerName}.publish();\n" +
+									  "\t${formManagerName}_Validate();\n" +
+									  "end\n\n" +
+									  "function ${formManagerName}_Validate()\n" +
+									  "\t${formManagerName}.isValid();\n" +
+									  "end\n"
+			}
+		]
+	}}
+
+	use GridLayoutLib;
+	use UtilLib;
+	columns int{@EGLProperty{setMethod = setColumns, getMethod = getColumns}, @VEProperty{}};
+	rows int{@EGLProperty{setMethod = setRows, getMethod = getRows}, @VEProperty{}};
+	cellPadding int{@EGLProperty{setMethod = setCellPadding, getMethod = getCellPadding}, @VEProperty{}};
+	
+	table Widget{tagName = "span"};
+	private innerTable Widget;
+	private widgetOrientationThis String = "";	
+	private cells Widget[] = [];
+	private defaultTDStyle string;
+	private loaded boolean = false;
+	private internalID string = "GridLayout-" + UtilLib.getSerial();
+	private tableCells Widget[][];
+	
+	function setWidth(width int in)
+		table.width = width;
+		if(table.children!=null && table.children.getSize() > 0 )
+			table.children[1].width = width;
+		end
+	end
+	
+	function setHeight(height int in)
+		table.height = height;
+		if(table.children!=null && table.children.getSize() > 0 )
+			table.children[1].height = height;
+		end
+	end
+	
+	function removeCells()
+		if(cells.getSize()>0)
+			tds Widget[] = innerTable.getElementsByTagName("td");
+	        count int = tds.getSize();
+	        for(n int from 1 to count)
+	        	if(tds[n].children.getSize()>0 && StrLib.indexOf(tds[n].id, internalID) == 1)
+	            	tds[n].removeChildren();
+	            end            
+	        end
+		end
+		cells = [];
+	end
+		
+	function initTable()
+		if ( columns == 0 || rows == 0 )
+			return;
+		end
+		// Remove all the widgets, and then destroy the td to avoid memory leak.	
+		if(table.children.getSize()>0)
+			innerTable = table.children[1];
+			table.removeChildren();
+			removeCells();
+	        UtilLib.destroyWidget(innerTable);
+		end
+		
+		defaultTDStyle = "";//"width:" + widthPercent + "%;height:" + heightPercent + "%;";
+		tdStyle string = defaultTDStyle + "padding:" + cellPadding + "px";
+		
+		UtilLib.utilNative.clearHTMLString();
+		tableStyle String = "";
+		if(table.width != "")
+			tableStyle = "width:" + table.width + ";";
+		end
+		if(table.height != "")
+			tableStyle = tableStyle + "height:" + table.height + ";\"";
+		end
+		if(tableStyle != "")
+			UtilLib.utilNative.appendHTMLString("<table style=\"" + tableStyle + "\"><tbody>");
+		else
+			UtilLib.utilNative.appendHTMLString("<table><tbody>");
+		end
+		for ( row int from 1 to rows )
+			UtilLib.utilNative.appendHTMLString("<tr id='" + internalID + "-TR-" + row + "'>");
+			
+			for ( column int from 1 to columns )				
+				tdID string = internalID + "-TD-" + row + "-" + column;
+				UtilLib.utilNative.appendHTMLString("<td id='" + tdID + "' class='EglRuiVAlignTop EglRuiBoxTd' ");
+				UtilLib.utilNative.appendHTMLString("style='" + tdStyle + "' row='" + row + "' column='"+column+"'>&nbsp;</td>");
+			end
+			UtilLib.utilNative.appendHTMLString("</tr>");
+		end
+		UtilLib.utilNative.appendHTMLString("</tbody></table>");
+		table.innerHTML = UtilLib.utilNative.getHTMLString();
+		tableCells = new widget[0][0];
+	end
+	
+	function setChildren(children1 Widget[] in) {@Override}
+		if (children1 == null)
+			throw new RuntimeException { message="Children cannot be null" };
+		end
+		if(widgetOrientationThis != "")
+			table.widgetOrientation = widgetOrientationThis;
+			if (widgetOrientationThis == "RTL")
+				table.setAttribute("align", "right");
+			else
+				table.setAttribute("align", "left");		
+			end
+		end
+		initTable();
+		if ( columns == 0 || rows == 0 )
+			for (index int from 1 to children1.getSize() by 1)
+				addCell(children1[index]);
+			end
+			return;
+		end
+		
+		for( row int from 1 to rows)
+			tableCells.appendElement(new Widget[0]);
+			for( col int from 1 to columns)
+				tableCells[row].appendElement(table.children[1].children[1].children[row].children[col]);
+			end
+		end
+		
+		for (index int from 1 to children1.getSize() by 1)
+			appendChild(children1[index]);
+		end
+	end
+	
+	function getChildren() returns(Widget[]) {@Override}
+		return (cells);
+	end
+	
+	function appendChild(newChild Widget in)  {@Override}
+		if (newChild == null)
+			throw new RuntimeException { message="Child to add cannot be null" };
+		end
+		if(widgetOrientationThis != "")
+			if(newChild.widgetOrientation == "")
+				newChild.widgetOrientation = widgetOrientationThis;
+			end
+		end
+		addCell(newChild);
+		newChild.logicalParent = this;
+		gridData GridLayoutData;
+		if ( newChild.layoutData != null )
+			gridData = newChild.layoutData as GridLayoutData;
+		else
+			return;
+		end
+		if(!this.isValidGridLayoutData(gridData))
+			return;
+		end
+
+		td Widget = tableCells[gridData.row][gridData.column];
+		
+		if ( td != null && (td.getAttribute( "occupied" ) as String) != "true" )			
+			childCells Widget[0];
+			for ( j int from 1 to gridData.horizontalSpan - 1 )
+				if( gridData.column + j <= columns)
+					tempTd Widget = tableCells[gridData.row][gridData.column + j];					
+					if ( tempTd != null && tempTd.innerHTML == "&nbsp;" )
+						childCells.appendElement(tempTd);
+					else
+						childCells.removeAll();
+						return;
+					end
+				end
+			end
+			for ( i int from 1 to gridData.verticalSpan - 1 )
+				if( gridData.row + i <= rows )
+					for ( j int from 0 to gridData.horizontalSpan - 1 )
+						if( gridData.column + j <= columns)
+							tempTd Widget = tableCells[gridData.row + i][gridData.column + j];							
+							if ( tempTd != null && tempTd.innerHTML == "&nbsp;" )
+								childCells.appendElement(tempTd);
+							else
+								childCells.removeAll();
+								return;
+							end
+						end
+					end
+				end
+			end
+			
+			for( i int from 1 to childCells.getSize())
+				childCells[i].parent.removeChild(childCells[i]);
+				UtilLib.destroyWidget(childCells[i]);
+			end
+			
+			if(widgetOrientationThis == "RTL")
+				td.setAttribute("align", "right");	
+			end
+						
+			if ( gridData.horizontalAlignment > 0 )
+				case (gridData.horizontalAlignment)
+					when(ALIGN_LEFT)
+						td.setAttribute("align", "left");
+					when(ALIGN_CENTER)
+						td.setAttribute("align", "center");
+					when(ALIGN_RIGHT)
+						td.setAttribute("align", "right");
+				end
+			end
+			if ( gridData.verticalAlignment > 0 )
+				case (gridData.verticalAlignment)
+					when(VALIGN_TOP)
+						td.class = "EglRuiVAlignTop EglRuiBoxTd";
+					when(VALIGN_MIDDLE)
+						td.class = "EglRuiVAlignMiddle EglRuiBoxTd";
+					when(VALIGN_BOTTOM)
+						td.class = "EglRuiVAlignBottom EglRuiBoxTd";
+				end
+			end			
+			td.removeChildren();					
+			td.setAttribute( "rowSpan", gridData.verticalSpan );
+			td.setAttribute( "colSpan", gridData.horizontalSpan );
+			if(gridData.widthHint != null)
+				td.setAttribute("width", gridData.widthHint);
+			end
+			if(gridData.heightHint != null)
+				td.setAttribute("height", gridData.heightHint);
+			end
+			td.appendChild(newChild);
+			td.setAttribute( "occupied", "true" );	
+			if ( gridData.cellPadding > 0 )
+				td.style = defaultTDStyle + "padding:" + gridData.cellPadding + "px";
+			end
+		end		
+	end
+	
+	function removeChild(child Widget in) {@Override}
+		for (index int from 1 to cells.getSize() by 1)
+			if (cells[index] == child)
+				cells.removeElement(index);
+				child.parent.removeChild(child);
+				setChildren(cells);
+				return;		
+			end
+		end
+		
+	end
+	
+	function removeChildren()  {@Override}
+		removeCells();
+		layout();
+	end
+	
+	private function addCell(child Widget in)
+		for(i int from 1 to cells.getSize())
+			if(cells[i] == child)
+				return;
+			end
+		end
+		cells.appendElement(child);
+	end
+	
+	function layout()
+		setChildren(cells);
+	end
+	
+	function getColumns() returns(int)
+		return (this.columns);
+	end
+	
+	function setColumns(columns int in)
+		this.columns = columns;
+		layout();
+	end
+	
+	function getRows() returns(int)
+		return (this.rows);
+	end
+
+	function setRows(rows int in)
+		this.Rows = rows;
+		layout();
+	end
+
+	function getCellPadding() returns(int)
+		return (this.cellPadding);
+	end
+
+	function setCellPadding(cellPadding int in)
+		this.cellPadding = cellPadding;
+		if ( table.children.getSize() <= 0 )
+			return;
+		end
+		oDisplayStyle string = table.displayStyle;
+		table.displayStyle = "none";
+		tds Widget[] = table.getElementsByTagName("td");
+        count int = tds.getSize();
+        for(n int from 1 to count)
+        	tds[n].style =  defaultTDStyle + "padding:" + cellPadding + "px"; 
+        end
+		table.displayStyle = oDisplayStyle;
+	end
+	
+	function getWidgetOrientation() returns (String) { @Override }
+		return (this.widgetOrientationThis);
+	end
+	
+	function setWidgetOrientation(widgetOrientation String in) { @Override }
+		this.widgetOrientationThis = widgetOrientation;		
+		if(widgetOrientationThis != "" && cells.getSize() > 0)
+			table.widgetOrientation = widgetOrientationThis;
+			if (widgetOrientationThis == "RTL")
+				table.setAttribute("align", "right");
+			else
+				table.setAttribute("align", "left");				
+			end
+			for (index int from 1 to cells.getSize() by 1)
+				if(cells[index].widgetOrientation == "")
+					cells[index].widgetOrientation = widgetOrientationThis;
+				end
+			end			
+		end		
+	end
+	
+	function isValidGridLayoutData(gridData GridLayoutData in) returns (boolean)
+		if(gridData.row <= 0 || gridData.row > this.rows || gridData.column <= 0 || gridData.column > this.columns ||
+		gridData.verticalSpan <= 0 || gridData.verticalSpan + gridData.row > this.rows + 1 || 
+		gridData.horizontalSpan <= 0 || gridData.horizontalSpan + gridData.column > this.columns + 1)
+			return (false);
+		else
+			return (true);
+		end
+	end 
+
+end
+
+record GridLayoutData type basicRecord
+	row int{@VEProperty{}};
+	column int{@VEProperty{}};
+	horizontalSpan int{@VEProperty{}} = 1;
+	verticalSpan int{@VEProperty{}} = 1;
+	cellPadding int{@VEProperty{}};
+	widthHint String{@VEProperty{}};
+	heightHint string{@VEProperty{}};
+	horizontalAlignment int{@VEProperty{
+		propertyType = "choice",
+		choices = [
+			@VEPropertyChoice {displayName = "LEFT", id = "${typeName:com.ibm.egl.rui.widgets.GridLayoutLib}.ALIGN_LEFT"},
+			@VEPropertyChoice {displayName = "CENTER", id = "${typeName:com.ibm.egl.rui.widgets.GridLayoutLib}.ALIGN_CENTER"},
+			@VEPropertyChoice {displayName = "RIGHT", id = "${typeName:com.ibm.egl.rui.widgets.GridLayoutLib}.ALIGN_RIGHT"}
+		],
+		default = "com.ibm.egl.rui.widgets.GridLayoutLib.ALIGN_LEFT"
+	}};
+	verticalAlignment int{@VEProperty{
+		propertyType = "choice",
+		choices = [
+			@VEPropertyChoice {displayName = "TOP", id = "${typeName:com.ibm.egl.rui.widgets.GridLayoutLib}.VALIGN_TOP"},
+			@VEPropertyChoice {displayName = "MIDDLE", id = "${typeName:com.ibm.egl.rui.widgets.GridLayoutLib}.VALIGN_MIDDLE"},
+			@VEPropertyChoice {displayName = "BOTTOM", id = "${typeName:com.ibm.egl.rui.widgets.GridLayoutLib}.VALIGN_BOTTOM"}
+		],
+		default = "com.ibm.egl.rui.widgets.GridLayoutLib.VALIGN_MIDDLE"
+	}} = GridLayoutLib.VALIGN_MIDDLE;
+end
+

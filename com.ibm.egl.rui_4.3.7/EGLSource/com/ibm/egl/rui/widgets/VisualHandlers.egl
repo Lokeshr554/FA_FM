@@ -1,0 +1,21 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+ExternalType VisualHandlers  type JavaScriptObject {
+		relativePath = "com/ibm/egl/rui/widgets",
+		javaScriptName = "VisualHandlers"
+	}
+	
+	function AttachHandlers(widget any in);
+	function ReverseText(widget any in); 		
+	function BidiReorder(text String in, inBidiFormat String in, outBidiFormat String in) returns (String);
+
+end
+

@@ -1,0 +1,77 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+Handler Tree type RUIWidget{targetWidget = nodeContainer }
+
+	behaviors TreeNodeBehavior[0];
+	nodeContainer Widget { tagName="div" };
+	private reverseTextDirectionThis String = "No";
+	private textLayoutThis String = "Logical";
+	
+	function setChildren(children Widget[])  {@Override}
+		if (backgroundColor == "")
+			throw new RuntimeException { message="A value for backgroundColor is required on a Tree to work correctly. Set it to \"white\" if none is needed." };
+		end
+		childrenCount int = children.getSize();
+		nodeContainer.removeChildren();
+		for (n int from 1 to childrenCount by 1)
+			node TreeNode = children[n];
+			appendChild(node);
+			node.markAsLast(n==childrenCount, backgroundColor);				
+			if(this.textLayoutThis == "Visual" || this.reverseTextDirectionThis == "Yes")
+				node.setBiDiStyle(this.textLayoutThis,this.reverseTextDirectionThis);							
+			end
+		end
+	end	
+	
+	function appendChild (child Widget in)  {@Override}
+		node TreeNode = child;
+		nodeContainer.appendChild(child);
+		node.applyBehaviors(behaviors, backgroundColor);
+	end	
+	
+	function removeChild (child Widget in)  {@Override}
+		nodeContainer.removeChild(child);
+	end
+	
+	function removeChildren ()  {@Override}
+		nodeContainer.removeChildren();
+	end
+
+	function setReverseTextDirection( reverseTextDirection String in) { @Override }
+		this.reverseTextDirectionThis = reverseTextDirection;
+		setChildrenBiDiStyle();
+	end
+	
+	function getReverseTextDirection() returns (String) { @Override }
+		return (this.reverseTextDirectionThis);
+	end	
+
+	function setTextLayout( textLayout String in) { @Override }
+		this.textLayoutThis = textLayout;
+		setChildrenBiDiStyle();
+	end
+	
+	function getTextLayout() returns (String) { @Override }
+		return (this.textLayoutThis);
+	end	
+	
+	function setChildrenBiDiStyle()	
+		children Widget [] = nodeContainer.children;
+		if(children != null && children.getSize() > 0)
+			for (i int from 1 to children.getSize() by 1)
+				node TreeNode = children[i];			
+				node.setBiDiStyle(this.textLayoutThis,this.reverseTextDirectionThis);	
+			end
+		end		
+	end	
+end
+	
+Delegate TreeNodeBehavior(node TreeNode in) end

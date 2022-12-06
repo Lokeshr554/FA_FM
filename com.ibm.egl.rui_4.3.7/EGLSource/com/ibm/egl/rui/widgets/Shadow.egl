@@ -1,0 +1,35 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+handler Shadow type RUIWidget{tagName = "div" }
+
+	div Div { @EGLProperty { setMethod=setDiv, getMethod=getDiv }, class="eze$$tempDiv" };
+	
+	function setDiv(div Div in)
+		if(this.div.class == "eze$$tempDiv")
+			UtilLib.destroyWidget(this.div);
+		end
+		this.class = "EglRuiShadowDiv1";
+		appendChild(
+			new	Div { class = "EglRuiShadowDiv2", children = [ 
+				new Div { class = "EglRuiShadowDiv3", children = [ 
+					div as Widget
+				]} as Widget 
+			]} 
+		);
+		div.class = div.class + " EglRuiShadowDiv4";
+		this.div = div;
+	end
+
+	function getDiv() returns(Div)
+		return (div );
+	end
+	
+end

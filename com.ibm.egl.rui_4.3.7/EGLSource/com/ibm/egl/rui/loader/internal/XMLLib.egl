@@ -1,0 +1,180 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.loader.internal;
+
+import com.ibm.egl.rui.loader.services.RuiDeploy;
+
+library XMLLib type BasicLibrary {}
+	
+	function convertFromXML(xml String in, result RuiDeploy inout)
+		try
+		    doc Document = parseXML(xml);
+		    ruiDeploy Node = doc.getChildNodes().item(0);
+		    list NodeList = ruiDeploy.getChildNodes();
+		    debug("initialize result");
+		    result.imports._import = [];
+		    result.includes.include = [];
+		    result.propertyFiles.propertyFile = [];
+		    result.runtimePropertyFiles.runtimePropertyFile = [];	 
+		    result.referencedHandlers.referencedHandler = [];
+		    for (i int from 0 to list.getLength()-1)
+		    	node Node = list.item(i);	    	
+		    	name String = node.getNodeName();
+		    	debug("Inspect doc child "+i+" "+name);
+		    	nodeList NodeList = node.getChildNodes();
+		    	case (name)
+		    		when ("includes")
+		    			for (j int from 0 to nodeList.getLength()-1)
+		    				if (nodeList.item(j).getNodeName() == "include")
+			    				value String = nodeList.item(j).getTextContent();
+						    	debug("   add include "+j+" "+value);
+			    				result.includes.include ::= value;
+			    			end
+		    			end
+		    		when ("propertyFiles")
+		    			for (j int from 0 to nodeList.getLength()-1)
+		    				if (nodeList.item(j).getNodeName() == "propertyFile")
+			    				value String = nodeList.item(j).getTextContent();
+					    		debug("   add property bundle "+j+" "+value);
+		    					result.propertyFiles.propertyFile ::= value;
+			    			end
+		    			end
+		    		when ("imports")
+		    			for (j int from 0 to nodeList.getLength()-1)
+		    				if (nodeList.item(j).getNodeName() == "import")
+			    				value String = nodeList.item(j).getTextContent();
+						    	debug("   add import "+j+" "+value);
+		    					result.imports._import ::= value;
+			    			end
+		    			end
+		    		when ("runtimePropertyFiles")
+		    			for (j int from 0 to nodeList.getLength()-1)
+		    				if (nodeList.item(j).getNodeName() == "runtimePropertyFile")
+			    				value String = nodeList.item(j).getTextContent();
+						    	debug("   add runtimePropertyFiles "+j+" "+value);
+			    				result.runtimePropertyFiles.runtimePropertyFile ::= value;
+			    			end
+		    			end
+		    		when ("referencedHandlers")
+		    			for (j int from 0 to nodeList.getLength()-1)
+		    				if (nodeList.item(j).getNodeName() == "referencedHandler")
+			    				value String = nodeList.item(j).getTextContent();
+						    	debug("   add referencedHandlers "+j+" "+value);
+			    				result.referencedHandlers.referencedHandler ::= value;
+			    			end
+		    			end
+		    		otherwise
+		    			debug("UNHANDLED NODE: "+name+"="+node.getTextContent());
+		    	end
+		    end
+		onException (e AnyException)
+			writeStdout("Could not convert XML due to "+e.message+". XML="+xml);
+		end
+	end
+	
+	function convertFromXMLForImport(xml String in, result RuiDeploy inout)
+		try
+		    doc Document = parseXML(xml);
+		    ruiDeploy Node = doc.getChildNodes().item(0);
+		    list NodeList = ruiDeploy.getChildNodes();
+		    debug("initialize result");
+		    result.imports._import = [];
+		    result.includes.include = [];
+		    result.propertyFiles.propertyFile = [];
+		    result.runtimePropertyFiles.runtimePropertyFile = [];	 
+		    result.referencedHandlers.referencedHandler = [];
+		    for (i int from 0 to list.getLength()-1)
+		    	node Node = list.item(i);	    	
+		    	name String = node.getNodeName();
+		    	debug("Inspect doc child "+i+" "+name);
+		    	nodeList NodeList = node.getChildNodes();
+		    	case (name)
+		    		when ("imports")
+		    			for (j int from 0 to nodeList.getLength()-1)
+		    				if (nodeList.item(j).getNodeName() == "import")
+			    				value String = nodeList.item(j).getTextContent();
+						    	debug("   add import "+j+" "+value);
+		    					result.imports._import ::= value;
+			    			end
+		    			end
+		    		otherwise
+		    			debug("UNHANDLED NODE: "+name+"="+node.getTextContent());
+		    	end
+		    end
+		onException (e AnyException)
+			writeStdout("Could not convert XML due to "+e.message+". XML="+xml);
+		end
+	end
+	
+	//
+	// Turn an XML string into a DOM Document
+	//
+	function parseXML(xml String in) returns(Document)
+		domFactory DocumentBuilderFactory = DocumentBuilderFactory.newInstance();
+	    domFactory.setNamespaceAware(true);
+	    builder DocumentBuilder = domFactory.newDocumentBuilder();
+	    file File = File.createTempFile("egl", ".xml"); 
+	    writer FileWriter = new FileWriter(file);
+	    writer.write(xml, 0, strlib.characterLen(xml));
+	    writer._close();
+	    doc Document = builder.parse(file.toString());
+	    file._delete();
+	    return(doc);
+	end
+	
+	function debug(s String in)
+		// writeStdout(s);
+	end
+	
+end
+
+ExternalType DocumentBuilderFactory type JavaObject {JavaName = "DocumentBuilderFactory", PackageName = "javax.xml.parsers"}    
+    static function newInstance() returns(DocumentBuilderFactory);
+    function setNamespaceAware(answer boolean in);
+    function newDocumentBuilder() returns(DocumentBuilder);
+End
+
+ExternalType DocumentBuilder type JavaObject {JavaName = "DocumentBuilder", PackageName = "javax.xml.parsers"}
+	function parse(uri string in) returns(Document);
+	function newDocument() returns(Document);	
+end
+
+ExternalType Document extends Node type JavaObject {JavaName = "Document", PackageName = "org.w3c.dom"}    
+    function getDocumentElement() returns(Element);
+end
+
+ExternalType JavaObj type JavaObject {JavaName = "Object", PackageName = "java.lang"}    
+end
+
+ExternalType Element extends Node type JavaObject {JavaName = "Element", PackageName = "org.w3c.dom"}
+    function getAttribute(a string in, b string in);
+    function getParentNode()returns(Node);
+end
+
+ExternalType NodeList type JavaObject {JavaName = "NodeList", packageName = "org.w3c.dom"}	
+	function getLength() returns(int);
+	function item(index int in)returns(Node);
+end
+
+ExternalType Node type JavaObject {JavaName = "Node", packageName = "org.w3c.dom"}	
+	function getTextContent() returns(String);
+	function getNodeName() returns(String);
+	function getChildNodes() returns(NodeList);
+end
+
+ExternalType File type JavaObject {JavaName = "File", PackageName = "java.io"}    
+    static function createTempFile(prefix String in, suffix String in) returns(File);
+    function _delete() { JavaName = "delete" };
+End
+
+ExternalType FileWriter type JavaObject {JavaName = "FileWriter", PackageName = "java.io"}    
+    constructor(file File in);
+    function write(str String in, offset int in, length int in);
+    function _close()  { JavaName = "close"};
+End

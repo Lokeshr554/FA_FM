@@ -1,0 +1,58 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+library InternalTimestampFormatter
+	use InternalMessageLib;
+	
+	function format(input string in, format string in, typeChkMsgKey string in) returns(string)
+		if (input == "")
+			return("");
+		end
+		
+		if (format == "")
+			format = strlib.defaultTimestampFormat;
+			if (format == "")
+				format = "yyyy-MM-dd HH:mm:ss";
+			end
+		end
+		
+		try
+			timestampInput timestamp = input;
+			return(strlib.formatTimestamp(timestampInput, format));
+		onException(exception AnyException)
+			throw new RuntimeException {message = getRuntimeErrorMessage(typeChkMsgKey, "CRRUI2717E", [format]), messageId = "CRRUI2717E"};
+		end
+	end
+	
+	function unformat(input string in, format string in, typeChkMsgKey string in) returns(string)
+		if (input == "")
+			return("");
+		end
+		
+		if (format == "")
+			format = strlib.defaultTimestampFormat;
+			if (format == "")
+				format = "yyyy-MM-dd HH:mm:ss";
+			end
+		end
+		
+		savedFormat string = strlib.defaultTimestampFormat;
+		try
+			strlib.defaultTimestampFormat = format;
+			result timestamp = input;
+			strlib.defaultTimestampFormat = savedFormat;
+			return(result as string);
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultDateFormat;
+			strlib.defaultTimestampFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(typeChkMsgKey, "CRRUI2717E", [errorFormat]), messageId = "CRRUI2717E"};
+		end
+	end
+end

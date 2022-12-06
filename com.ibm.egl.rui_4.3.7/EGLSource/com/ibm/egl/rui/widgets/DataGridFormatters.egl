@@ -1,0 +1,97 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+library DataGridFormatters
+
+    function dollarSigns(class string, value string, rowData any in)
+        value = "$" + value;
+    end
+
+    function coloredNumbers(class string, value string, rowData any in)
+        if(value < 0)
+            class += " EglRuiDataGridCellNegative";
+        else
+            if(value == 0)
+                class += " EglRuiDataGridCellNull";
+            else
+                class += " EglRuiDataGridCellPositive";
+            end
+        end
+    end
+
+    function addCommas(class string, value string, rowData any in)
+    	if (value == "")
+			return;
+		end
+		len int = strlib.characterLen(value);
+		for (i int from 1 to len)
+			s string = value[i:i];    			
+    		if ( (s < "0" || s > "9") && s != "." && ( i != 1 || s != "-" ) )
+    			return;
+    		end
+    	end
+		preDecimal string;
+		postDecimal string;
+		decimalIndex int = strlib.indexOf(value, ".");
+		startIndex int = 1;
+		if( value[1:1] == "-" )
+			startIndex = 2;
+		end
+		if (decimalIndex > 1)
+			preDecimal = value[1:decimalIndex - 1];
+			if (strlib.characterLen(value) > decimalIndex)
+				postDecimal = value[decimalIndex + 1:strlib.characterLen(value)];
+			end 
+		else
+			if (decimalIndex == 1)
+				if (strlib.characterLen(value) > 1)
+					postDecimal = value[2:strlib.characterLen(value)];
+				end 
+			else
+				preDecimal = value;
+			end
+		end
+
+		separatorChar string = ",";
+		for (i int from strlib.characterLen(preDecimal) - 3 to startIndex decrement by 3)
+			preDecimal = preDecimal[1:i] + separatorChar + preDecimal[i+1:strlib.characterLen(preDecimal)];
+		end
+		value = preDecimal + "." + postDecimal;
+    end
+
+    function percentage(class string, value string, rowData any in)
+        value += "%";
+    end
+
+    function fontWeightItalic(class string, value string, rowData any in)
+        value = "<i>" + value + "</i>";
+    end
+
+    function fontWeightBold(class string, value string, rowData any in)
+        value = "<b>" + value + "</b>";
+    end
+
+    function fontWeightUnderlined(class string, value string, rowData any in)
+        value = "<u>" + value + "</u>";
+    end
+
+    function fontWeightBoldItalic(class string, value string, rowData any in)
+        value = "<i><b>" + value + "</b></i>";
+    end
+
+    function makeLink(class string, value string, rowData any in)
+        class += " EglRuiDataGridCellLink";
+        value = "<span onClick='" +
+                "egl.com.ibm.egl.rui.infobus.InfoBus.$inst.publish(\"grid.link\",egl.createWidget(this.parentNode.parentNode))'>" +
+                value + "</span>";
+    end
+
+end
+	

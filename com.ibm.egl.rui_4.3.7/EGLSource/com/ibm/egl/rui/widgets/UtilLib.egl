@@ -1,0 +1,66 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.widgets;
+
+import egl.ui.rui.Widget;
+
+externalType UtilLibNative type JavaScriptObject{relativePath = "com/ibm/egl/rui/widgets", javaScriptName = "UtilLibNative"}
+
+	function getWidgetVariableName( widget Widget in ) returns (String);
+	function destroyWidget( widget Widget in );
+	function destroyWidgetChildren( widget Widget in );
+	function destroyRUIHandler( ruiHandler any in);
+	function clearHTMLString();
+	function appendHTMLString(str String in);
+	function getHTMLString() returns(string);
+	function encodeString( str String in ) returns(string);
+end
+
+// basic library
+library UtilLib type BasicLibrary { }
+
+	utilNative UtilLibNative{};
+	private serialNum int = 0;
+	
+	function getSerial() returns(int)
+		serialNum = serialNum+1;
+		return(serialNum);
+	end
+	
+   	function getWidgetVariableName( widget Widget in ) returns (String)
+   		return (utilNative.getWidgetVariableName(widget));
+   	end
+   	
+   	function destroyWidget( widget Widget in )   		
+   		utilNative.destroyWidget(widget);
+   	end 
+   	
+   	function destroyWidgetChildren( widget Widget in )
+   		if(widget == null)
+   			return;
+   		end
+		if(widget isa Box)
+			box Box = widget as Box;
+			utilNative.destroyWidgetChildren(box.body);
+			box.removeChildren();
+			return;
+		end
+		if(widget isa GridLayout)
+			gridLayout GridLayout = widget as GridLayout;
+			utilNative.destroyWidgetChildren(gridLayout.table);
+			gridLayout.removeChildren();
+			return;
+		end
+   		utilNative.destroyWidgetChildren(widget);
+   	end
+   	
+   	function destroyRUIHandler(ruiHandler any in)
+   		utilNative.destroyRUIHandler(ruiHandler);
+   	end
+end

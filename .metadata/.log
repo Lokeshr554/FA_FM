@@ -1,0 +1,16 @@
+!SESSION 2022-12-06 11:51:16.776 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.7.16 - pwa6480sr7fp16-20220830_01(SR7 FP16)
+JRE 1.8.0 Windows 10 amd64-64-Bit Compressed References 20220817_34480 (JIT enabled, AOT enabled)
+OpenJ9   - 55f250a
+OMR      - f0ddca6
+IBM      - bf759bf
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_IN
+Framework arguments:  -product com.ibm.rational.rbd.product.v95.ide
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product com.ibm.rational.rbd.product.v95.ide
+
+!ENTRY org.eclipse.emf.ecore 2 0 2022-12-06 11:54:03.608
+!MESSAGE Both 'com.ibm.etools.tpm.framework.ui' and 'com.ibm.xtools.uml.msl' register an extension parser for 'emx'
+
+!ENTRY org.eclipse.emf.ecore 2 0 2022-12-06 11:54:03.608
+!MESSAGE Both 'com.ibm.etools.tpm.framework.ui' and 'org.eclipse.uml2.uml' register an extension parser for 'uml'

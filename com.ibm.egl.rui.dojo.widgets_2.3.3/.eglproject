@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource name="com.ibm.egl.rui.dojo.widgets_2.3.3">
+	<storedValue key="EGLProjectSecondaryMigrationVersion" value="9.0"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptTargetPath" value="com.ibm.egl.rui.dojo.widgets_2.3.3/EGLSource/com_ibm_egl_rui_dojo_widgets.eglbld"/>
+	<storedValue key="EGLTargetRuntimeMask" value="3"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptDebugPath" value="com.ibm.egl.rui.dojo.widgets_2.3.3/EGLSource/com_ibm_egl_rui_dojo_widgets.eglbld"/>
+	<storedValue key="EGLProjectMigrationVersion" value="8.0.0"/>
+	<storedValue key="EGLProjectFeatureMask" value="16"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptTargetName" value="com_ibm_egl_rui_dojo_widgetsJavaScriptBuildOptions"/>
+	<storedValue key="DefaultBuildDescriptorJavaScriptDebugName" value="com_ibm_egl_rui_dojo_widgetsJavaScriptBuildOptions"/>
+</resource>

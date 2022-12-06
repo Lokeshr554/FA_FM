@@ -1,0 +1,126 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+
+package com.ibm.egl.rui.loader;
+
+import com.ibm.egl.rui.loader.internal.DebugView;
+import com.ibm.egl.rui.loader.internal.ModuleLoader;
+import egl.ui.rui.Widget;
+
+record HandlerLoadedEvent
+	// The name of the handler
+	name String;
+	
+	// The widgets defined by the RUIhandler that is the root of the module
+	initialUI Widget[];
+
+	// A reference to the RUIhandler that is the root of the module
+	theHandler any;
+end
+
+delegate LoadDoneListener (event HandlerLoadedEvent in) end
+delegate LoadFailListener (handlerName string in, msg string in) end
+delegate LoadInfoListener(handlerName string in, resourceName String in, code string in, msg string in) end
+
+
+library DynamicLoader type BasicLibrary {}
+	
+	//
+	// Dynamically load a RUIHandler from the server and load it into the current document.
+	// An instance of the handler is created after loading
+	//
+	// handlerName:		fully qualified handler name, including path name
+	//
+	function loadHandler(handlerName String in)
+		new ModuleLoader{}.loadHandler(handlerName, true);	
+	end
+
+	//
+	// Dynamically load a RUIHandler from the server and load it into the current document.
+	// No handler instance is created after loading
+	//
+	// handlerName:		fully qualified handler name, including path name
+	//
+	function loadHandlerNoInstantiation(handlerName String in)
+		new ModuleLoader{}.loadHandler(handlerName, false);
+	end
+	//
+	// Unload a previously loaded RUIHandler from the current document.
+	//
+	// handlerName:		fully qualified handler name, including path name
+	//
+	function unloadHandler(handlerName String in)
+		new ModuleLoader{}.unloadHandler(handlerName);
+	end
+
+	//
+	// Show a debug view at the bottom of the page to show what is happening inside the dynamic loader
+	//
+	debugView DebugView=null;
+	function showDebugView()
+		if(debugView == null)
+			debugView = new DebugView{};
+		end
+	end
+
+	//
+	// The handler has been completely loaded (and created if needed).
+	//
+	loadDoneListeners LoadDoneListener[0];
+
+	//
+	// The module failed to load or instantiate
+	//
+	loadFailListeners LoadFailListener[0];
+
+	//
+	// Used for debugging: The module lifecycle events
+	//
+	loadInfoListeners LoadInfoListener[0];
+	
+	//
+	// Used for debugging: A given module fragment has been downloaded
+	//
+	INFO_LOAD String 		= "LOAD";
+
+	//
+	// Used for debugging: A given module fragment has unloadeded
+	//
+	INFO_UNLOAD String 	= "UNLOAD";
+
+	//
+	// Used for debugging: A given module fragment is skipped for unloading
+	//
+	INFO_UNLOAD_SKIP String 	= "UNLOAD_SKIP";
+
+	//
+	// Used for debugging: A generic message from the ModuleLoader
+	//
+	INFO_DEBUG String	= "DEBUG";
+
+	//
+	// Internal cache used by ModuleLoader
+	//		
+	deployCache Dictionary{};
+	
+	//
+	//Internal cache used by ModuleLoader for loaded js
+	//
+	loadedJsModuleCache Dictionary{};
+	
+	//
+	// Handlers starts with one of the filter string will not be unloaded
+	//
+	unloadFilter String [] = [
+		"com/ibm/egl/rui/",
+		"dojo/widgets/"
+		];
+	
+end
+

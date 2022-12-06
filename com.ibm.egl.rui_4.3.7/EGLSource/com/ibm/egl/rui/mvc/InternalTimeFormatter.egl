@@ -1,0 +1,52 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+library InternalTimeFormatter
+	use InternalMessageLib;
+	
+	function format(input string in, format string in, typeChkMsgKey string in) returns(string)
+		if (input == "")
+			return("");
+		end
+		
+		if (format == "")
+			format = strlib.defaultTimeFormat;
+		end
+		
+		try
+			timeInput time = input;
+			return(strlib.formatTime(timeInput, format));
+		onException(exception AnyException)
+			throw new RuntimeException {message = getRuntimeErrorMessage(typeChkMsgKey, "CRRUI2717E", [format]), messageId="CRRUI2717E"};
+		end
+	end
+	
+	function unformat(input string in, format string in, typeChkMsgKey string in) returns(string)
+		if (input == "")
+			return("");
+		end
+		
+		if (format == "")
+			format = strlib.defaultTimeFormat;
+		end
+		
+		savedFormat string = strlib.defaultTimeFormat;
+		try
+			strlib.defaultTimeFormat = format;
+			result time = input;
+			strlib.defaultTimeFormat = savedFormat;
+			return(result as string);
+		onException(exception AnyException)
+			errorFormat string = strlib.defaultTimeFormat;
+			strlib.defaultTimeFormat = savedFormat;
+			throw new RuntimeException {message = getRuntimeErrorMessage(typeChkMsgKey, "CRRUI2717E", [errorFormat]), messageId = "CRRUI2717E"};
+		end
+	end
+end

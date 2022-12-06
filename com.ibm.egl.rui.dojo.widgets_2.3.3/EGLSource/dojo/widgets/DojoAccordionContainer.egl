@@ -1,0 +1,73 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+import egl.ui.rui.Widget;
+
+/**
+ * This is a vertically stacked layout container. 
+ *
+ * At any point in time, the content of only one container is visible. 
+ * When a title bar of another container is clicked, animation is used to close the current pane, and open the new one.
+ * The duration of that animation is controlled by the "duration" parameter.  
+ *
+ * When selection is set before children are assigned, the requested pane will be the one opened, instead of the first.
+ *
+ * This layout widget can contain only children of type DojoContentPane. 
+ * Note that the "closable" field in DojoContentPane is ignored when used as a child of DojoAccordionContainer.
+ *
+ * For more information on the Dojo widget itself, see http://docs.dojocampus.org/dijit/layout/AccordionContainer
+ *
+ */
+ExternalType DojoAccordionContainer Extends DojoContainer type JavaScriptObject{
+		relativePath = "dojo/widgets",
+		javaScriptName = "DojoAccordionContainer",
+		@VEWidget{
+			category = "Layout",
+			template = 
+				"${typeName}{\n"+
+					"\t\twidth = \"165\", height = \"400\", duration = 500, //onTabSelected ::= TabSelected,\n"+
+					"\t\tchildren = [\n"+
+						"\t\t\tnew ${typeName:dojo.widgets.DojoContentPane} { title = \"Topic 1\", children = [\n"+
+						"\t\t\t] },\n"+
+						"\t\t\tnew ${typeName:dojo.widgets.DojoContentPane} { title = \"Topic 2\", children = [\n"+
+						"\t\t\t]},\n"+
+						"\t\t\tnew ${typeName:dojo.widgets.DojoContentPane} { title = \"Topic 3\", children = [\n"+
+						"\t\t\t]}\n"+
+					"\t\t]\n"+
+				"\t}",
+			displayName = "AccordionContainer",
+			smallIcon = "icons/ctool16/dijit_accpane_pal16.gif",
+			largeIcon = "icons/ctool24/dijit_accont_pal24.gif",
+			propertyFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+			propertyFilter = [ "disabled", "ariaLive", "ariaRole", "tabIndex" ],
+			eventFilterType  = RUILib.INCLUDE_ALL_EXCEPT,
+       		eventFilter  = ["onChange", "onSelect","onScroll"],
+			provider = "Dojo"
+		}   
+	}
+	
+	function resize(height String in, width String in);
+	
+	/*
+	 * The amount of time it takes for an individual pane to slide when the user clicks on a header
+	 */
+	duration int { @VEProperty{} };
+	
+	/*
+	 *  Parameter to select a given child content pane when assigned to before children are set. 
+	 */
+	selection int {@JavaScriptProperty{}, @VEProperty{} };
+
+	/*
+	 *  Triggered when a content pane is selected. Check the "selected" field to find out which one.
+	 */	
+	onTabSelected EventHandler[] {@JavaScriptProperty{}, @VEEvent{} };
+	
+end

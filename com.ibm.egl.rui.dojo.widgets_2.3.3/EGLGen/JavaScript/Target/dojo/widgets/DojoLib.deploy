@@ -1,0 +1,10 @@
+<deploy package="dojo.widgets" partName="DojoLib" partType="BasicLibrary" version="2">
+	<buildDescriptors>
+		<buildDescriptor name="com_ibm_egl_rui_dojo_widgetsJavaScriptBuildOptions" fileName="\com.ibm.egl.rui.dojo.widgets_2.3.3\EGLSource\com_ibm_egl_rui_dojo_widgets.eglbld" egldd="" genProject="com.ibm.egl.rui.dojo.widgets_2.3.3"/>
+	</buildDescriptors>
+	<includes>
+		<include>dojo/widgets/DojoValidatorLib.js</include>
+		<include>includeDojo.html</include>
+	</includes>
+	<ruiHandler/>
+</deploy>

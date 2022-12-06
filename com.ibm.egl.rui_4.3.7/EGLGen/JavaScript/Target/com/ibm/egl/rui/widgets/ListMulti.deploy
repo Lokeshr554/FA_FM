@@ -1,0 +1,23 @@
+<deploy package="com.ibm.egl.rui.widgets" partName="ListMulti" partType="RUIWidget" version="2">
+	<buildDescriptors>
+		<buildDescriptor name="com_ibm_egl_ruiJavaScriptBuildOptions" fileName="\com.ibm.egl.rui_4.3.7\EGLSource\com_ibm_egl_rui.eglbld" egldd="" genProject="com.ibm.egl.rui_4.3.7"/>
+	</buildDescriptors>
+	<includes>
+		<include>com/ibm/egl/rui/widgets/UtilLibNative.js</include>
+		<include>com/ibm/egl/rui/widgets/BoxLib.js</include>
+		<include>com/ibm/egl/rui/widgets/Div.js</include>
+		<include>com/ibm/egl/rui/widgets/GridLayoutLib.js</include>
+		<include>com/ibm/egl/rui/widgets/GridLayoutData.js</include>
+		<include>com/ibm/egl/rui/widgets/GridLayout.js</include>
+		<include>com/ibm/egl/rui/widgets/UtilLib.js</include>
+		<include>com/ibm/egl/rui/widgets/Box.js</include>
+		<include>com/ibm/egl/rui/widgets/ListMulti.js</include>
+	</includes>
+	<runtimePropertyFiles>
+		<runtimePropertyFile>rununit</runtimePropertyFile>
+	</runtimePropertyFiles>
+	<cssfiles>
+		<cssfile>css/com.ibm.egl.rui.css</cssfile>
+	</cssfiles>
+	<ruiHandler/>
+</deploy>

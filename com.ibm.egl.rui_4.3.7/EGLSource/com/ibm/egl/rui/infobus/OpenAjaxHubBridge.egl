@@ -1,0 +1,41 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.infobus;
+
+Delegate 
+	OpenAjaxHubCallback(eventName String in, dataObject any in)
+end
+
+//
+// This externalType shows how to use OpenAjax Hub for publish/subscribe
+//
+ExternalType OpenAjaxHubBridge type JavaScriptObject {
+        relativePath = "com/ibm/egl/rui/infobus",
+        javaScriptName = "OpenAjaxHubBridge",
+        includeFile = "com/ibm/egl/rui/infobus/open_ajax_hub_v10.js"
+    }
+   
+	//
+	// name			the name of the event to listen for. You can use dots and wildcards "*". 
+	// callback		the function to call when the event is published by anyone 
+	//   
+    function subscribe(name String in, callback OpenAjaxHubCallback) returns(any);
+    
+	//
+	// subscription	the subscription to cancel
+	//   
+    function unsubscribe(subscription any in);
+
+	//
+	// name			the name of the event to publish. You can use dots.
+	// data			the data that should be passed to all subscribers
+	//   	
+    function publish(name String in, data any in);
+
+end

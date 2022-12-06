@@ -1,0 +1,15 @@
+<deploy package="dojo.widgets" partName="DojoCheckBox" partType="RUIWidget" version="2">
+	<buildDescriptors>
+		<buildDescriptor name="com_ibm_egl_rui_dojo_widgetsJavaScriptBuildOptions" fileName="\com.ibm.egl.rui.dojo.widgets_2.3.3\EGLSource\com_ibm_egl_rui_dojo_widgets.eglbld" egldd="" genProject="com.ibm.egl.rui.dojo.widgets_2.3.3"/>
+	</buildDescriptors>
+	<includes>
+		<include>dojo/widgets/DojoBase.js</include>
+		<include>includeDojo.html</include>
+		<include>dojo/widgets/DojoCheckBoxWithoutLabel.js</include>
+		<include>dojo/widgets/DojoCheckBox.js</include>
+	</includes>
+	<runtimePropertyFiles>
+		<runtimePropertyFile>rununit</runtimePropertyFile>
+	</runtimePropertyFiles>
+	<ruiHandler/>
+</deploy>

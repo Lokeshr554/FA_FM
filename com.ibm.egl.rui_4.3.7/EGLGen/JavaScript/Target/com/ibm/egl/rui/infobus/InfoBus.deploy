@@ -1,0 +1,10 @@
+<deploy package="com.ibm.egl.rui.infobus" partName="InfoBus" partType="BasicLibrary" version="2">
+	<buildDescriptors>
+		<buildDescriptor name="com_ibm_egl_ruiJavaScriptBuildOptions" fileName="\com.ibm.egl.rui_4.3.7\EGLSource\com_ibm_egl_rui.eglbld" egldd="" genProject="com.ibm.egl.rui_4.3.7"/>
+	</buildDescriptors>
+	<includes>
+		<include>com/ibm/egl/rui/infobus/OpenAjaxHubBridge.js</include>
+		<include>com/ibm/egl/rui/infobus/open_ajax_hub_v10.js</include>
+	</includes>
+	<ruiHandler/>
+</deploy>

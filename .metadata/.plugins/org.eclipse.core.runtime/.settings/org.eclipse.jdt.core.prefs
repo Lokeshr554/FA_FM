@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+org.eclipse.jdt.core.classpathVariable.EGL_GENERATORS_PLUGINDIR=C\:/Program Files/HCL/HCLIMShared/plugins/com.ibm.etools.egl.java.runtime_8.0.0.v20221019_0813/
+org.eclipse.jdt.core.classpathVariable.EGL_PLUGINDIR=C\:/Program Files/HCL/HCLIMShared/plugins/com.ibm.etools.egl.resources_7.0.201.v20221019_0813/
+org.eclipse.jdt.core.classpathVariable.JAVAX_SERVLET_JAR=C\:/Program Files/HCL/HCLIMShared/plugins/javax.servlet_3.0.0.v201112011016.jar
+org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
+org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
+org.eclipse.jdt.core.compiler.compliance=1.8
+org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
+org.eclipse.jdt.core.compiler.problem.enumIdentifier=error
+org.eclipse.jdt.core.compiler.source=1.8

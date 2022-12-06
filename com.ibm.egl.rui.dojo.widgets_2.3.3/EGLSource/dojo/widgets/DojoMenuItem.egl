@@ -1,0 +1,38 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2011, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package dojo.widgets;
+
+/*
+ * This widget implements a menu item to be shown as part of a DojoMenu. 
+ * A menu item has a label, optional icon classes, and handles the onClick event
+ * A menu item can have only child, a DojoMenu, in which case it represents a nested menu. 
+ *
+ * For more detail, see http://docs.dojocampus.org/dijit/MenuItem
+ */
+ExternalType DojoMenuItem Extends DojoContainer type JavaScriptObject{
+		relativePath = "dojo/widgets",
+		javaScriptName = "DojoMenuItem"
+	}
+	
+	/**
+	 * The label shows for this menu item
+	 */
+	text String {@JavaScriptProperty{}, @VEProperty{}};
+	
+	/**
+	 * The class name that Dojo will assign to the icon portion of this menu item
+	 */ 
+	iconClass String;
+	
+	/*
+	 * Function for Bidi operation
+	 */
+	function setBiDiMarkers  (textLayout String in, reverseTextDirection String in);
+			
+end

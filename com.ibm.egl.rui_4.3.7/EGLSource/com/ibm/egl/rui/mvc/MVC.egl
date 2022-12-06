@@ -1,0 +1,60 @@
+/*
+ * Licensed Materials - Property of IBM
+ *
+ * Copyright IBM Corporation 2008, 2015. All Rights Reserved.
+ *
+ * U.S. Government Users Restricted Rights - Use, duplication or
+ * disclosure restricted by GSA DP Schedule Contract with IBM Corp.
+ */
+package com.ibm.egl.rui.mvc;
+
+Record MVC type Annotation
+{
+	targets = [
+		ElementKind.FieldMbr
+	],
+	eglIsSystemAnnotation = yes
+} 
+	model egl.core.reflect.FieldRef;
+	view egl.ui.rui.Widget;
+end
+
+Delegate 
+	MVCFormatterFunction(input String in) returns(String)
+end
+
+Delegate 
+	MVCValidatorFunction(input String in) returns(String?)
+end
+
+Delegate 
+	MVCCommitter(s String in) 
+end
+
+Delegate 
+	MVCValidStateSetter(widget Widget in, valid boolean in) 
+end
+
+Delegate 
+	MVCPublisher(s String in) 
+end
+
+Delegate 
+	MVCRetriever() returns(String) 
+end
+
+Delegate
+	MVCValidStateRetriever() returns(String?)
+end
+
+Delegate
+	MVCMessagePublisher(s String in)
+end
+
+Delegate 
+	MVCShowErrorState(aboolean boolean in)
+end
+
+Delegate
+	MVCStatePublisher(state boolean in)
+end
